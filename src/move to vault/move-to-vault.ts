@@ -1,9 +1,11 @@
 import * as path from "path";
 import * as fs from "fs-extra";
 import { picker } from "src/utils";
-import { Menu, MenuItem, TFolder } from "obsidian";
+import { Menu, MenuItem, Notice, TFolder } from "obsidian";
+import { OutFromVaultConfirmModal } from "src/move out from vault/out-of-vault-confirm_modal";
+import { getIncrementedFilePath } from "src/move out from vault/copy-move-out-of-vault";
 
-export function addMovetoVault() {
+export function addMoveToVault() {
     this.addCommand({
         id: 'move-files-to-vault',
         name: 'Move file(s) to Vault',
@@ -35,77 +37,82 @@ export function addMovetoVault() {
             moveToVault(true, false)
         }
     })
+
+    this.registerEvent(this.app.workspace.on("file-menu", createMTVFolderMenu()));
 }
 
-export async function moveToVault(directory: boolean, move: boolean, postPath?: string) {
-    let vaultPath = this.app.vault.adapter.getFullPath("");
-    if (postPath) {
-        vaultPath = path.join(vaultPath, postPath);
-    }
+export async function moveToVault(directory: boolean, move: boolean, postPath?: string): Promise<void> {
+    const vaultPath = this.app.vault.adapter.getBasePath();
+    const destinationPath = postPath ? path.join(vaultPath, postPath) : vaultPath;
+
     const msg = `Choose ${directory ? "dir(s)" : "file(s)"} to import`;
-    const selectedPaths = directory ? await picker(msg, ['openDirectory', 'multiSelections']) as string[] : await picker(msg, ['openFile', 'multiSelections']) as string[];
+    const selectedPaths = await picker(msg, directory ? ['openDirectory', 'multiSelections'] : ['openFile', 'multiSelections']) as string[];
 
-    if (!selectedPaths) return;
+    if (!selectedPaths || !selectedPaths.length) return;
 
-    // move selected files to vault
-    selectedPaths.forEach(async (p) => {
+    let runModal = false;
+    const existingFiles: string[] = [];
+
+    for (const p of selectedPaths) {
         const fileName = path.basename(p);
-        const destination = path.join(vaultPath, fileName as string)
-        try {
-            if (move) {
-                await fs.move(p, destination)
-                console.debug(`Moved ${fileName} to vault`);
-            }
-            else {
-                await fs.copy(p, destination)
-                console.debug(`Copied ${fileName} to vault`);
-            }
-        } catch (err) {
-            console.error(`Error moving ${fileName}: ${err}`);
+        const destination = path.join(destinationPath, fileName);
+        if (await fs.pathExists(destination)) {
+            runModal = true;
+            existingFiles.push(fileName);
         }
-    });
+    }
+
+    if (runModal) {
+        new OutFromVaultConfirmModal(this.app, true, [], async (result) => {
+            if (!result) return;
+            await processFiles(selectedPaths, destinationPath, move, result.pastOption);
+        }).open();
+    } else {
+        await processFiles(selectedPaths, destinationPath, move);
+    }
 }
 
-export function registerMTVmenus() {
-    this.registerEvent(this.app.workspace.on("file-menu", MTVFolderMenu()));
+async function processFiles(selectedPaths: string[], destinationPath: string, move: boolean, pastOption = 0) {
+    for (const p of selectedPaths) {
+        const fileName = path.basename(p);
+        let destination = path.join(destinationPath, fileName);
+
+        try {
+            if (pastOption === 2) {
+                destination = await getIncrementedFilePath(destinationPath, fileName);
+            }
+
+            if (move) {
+                await fs.move(p, destination, { overwrite: pastOption === 1 });
+            } else {
+                await fs.copy(p, destination, { overwrite: pastOption === 1 });
+            }
+            new Notice(`Successfully ${move ? 'moved' : 'copied'} ${fileName} to vault`);
+        } catch (err) {
+            console.warn(`Error ${move ? 'moving' : 'copying'} ${fileName}: ${err}`);
+            new Notice(`Failed to ${move ? 'move' : 'copy'} ${fileName} to vault`);
+        }
+    }
 }
 
-export function MTVFolderMenu() {
+function createMTVFolderMenu() {
     return (menu: Menu, folder: TFolder) => {
         if (!(folder instanceof TFolder)) return;
+
         menu.addSeparator();
-        menu.addItem((item: MenuItem) => {
-            item
-            .setTitle("Copy file(s) in folder")
-            .setIcon("copy")
-            .onClick(async () => {
-                moveToVault(false, false, folder.path);
+
+        const addMenuItem = (title: string, icon: string, directory: boolean, move: boolean) => {
+            menu.addItem((item: MenuItem) => {
+                item
+                    .setTitle(title)
+                    .setIcon(icon)
+                    .onClick(() => moveToVault(directory, move, folder.path));
             });
-        });
-        menu.addItem((item: MenuItem) => {
-            item
-            .setTitle("Move file(s) in folder")
-            .setIcon("scissors")
-            .onClick(async () => {
-                moveToVault(false, true, folder.path);
-            });
-        });
-        menu.addItem((item: MenuItem) => {
-            item
-            .setTitle("Copy dir(s) in folder")
-            .setIcon("copy")
-            .onClick(async () => {
-                moveToVault(true, false, folder.path);
-            });
-        });
-        menu.addItem((item: MenuItem) => {
-            item
-            .setTitle("Move dir(s) in folder")
-            .setIcon("scissors")
-            .onClick(async () => {
-                moveToVault(true, true, folder.path);
-            });
-        });
-        
-    }
+        };
+
+        addMenuItem("Copy file(s) to folder", "copy", false, false);
+        addMenuItem("Move file(s) to folder", "scissors", false, true);
+        addMenuItem("Copy dir(s) to folder", "copy", true, false);
+        addMenuItem("Move dir(s) to folder", "scissors", true, true);
+    };
 }

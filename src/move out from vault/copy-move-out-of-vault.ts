@@ -13,13 +13,10 @@ interface FileOperationResult {
 	error?: string;
 }
 
-export async function movOpenFileExplorer(
-	files: (TFile | TFolder)[],
-	job: "move" | "copy"
-): Promise<void> {
+export async function moveOutOfVault(files: (TFile | TFolder)[], job: "move" | "copy"): Promise<void> {
 	const msg = job === "move" ? MOVE_MESSAGE : COPY_MESSAGE;
-	const selectedPath = await picker(msg, ["openDirectory"]) as string;
-	if (!selectedPath) return;
+	const selectedPaths = await picker(msg, ["openDirectory"]) as string;
+	if (!selectedPaths || !selectedPaths.length) return;
 
 	let runModal = false;
 	const attached = new Set<TFile>();
@@ -27,22 +24,22 @@ export async function movOpenFileExplorer(
 	for (const file of files) {
 		const links = await hasResolvedLinks(file)
 		links.forEach((link) => attached.add(link));
-		if (await fileAlreadyInDest(file, selectedPath)) {
+		if (await fileAlreadyInDest(file, selectedPaths)) {
 			runModal = true;
 		}
 	}
 
 	if (runModal || attached.size > 0) {
-		new OutFromVaultConfirmModal(this.app, runModal, Array.from(attached), async (result) => {
+		new OutFromVaultConfirmModal(this.app, true, Array.from(attached), async (result) => {
 			if (!result) {
 				return;
 			}
-			await handler(this.app, result, files, selectedPath, job === "move");
-			await openDirectoryInFileManager(selectedPath);
+			await handler(this.app, result, files, selectedPaths, job === "move");
+			await openDirectoryInFileManager(selectedPaths);
 		}).open();
 	} else {
-		await withoutModal(this.app, files, selectedPath, job === "move");
-		await openDirectoryInFileManager(selectedPath);
+		await withoutModal(this.app, files, selectedPaths, job === "move");
+		await openDirectoryInFileManager(selectedPaths);
 	}
 }
 
@@ -63,31 +60,31 @@ async function hasResolvedLinks(file: TFile | TFolder): Promise<TFile[]> {
 
 async function fileAlreadyInDest(
 	file: TFile | TFolder,
-	selectedPath: string
+	selectedPaths: string
 ): Promise<boolean> {
-	const { destinationPath } = getDestinationPath(file, selectedPath);
+	const { destinationPath } = getDestinationPath(file, selectedPaths);
 	return fs.pathExists(destinationPath);
 }
 
 async function withoutModal(
 	app: App,
 	files: (TFile | TFolder)[],
-	selectedPath: string,
+	selectedPaths: string,
 	move: boolean
 ): Promise<void> {
 	for (const file of files) {
-		await simpleCopy(app, file, selectedPath, move);
+		await simpleCopy(app, file, selectedPaths, move);
 	}
-	new Notice(`File(s) ${move ? 'moved' : 'copied'} to ${selectedPath}`, 4000);
+	new Notice(`File(s) ${move ? 'moved' : 'copied'} to ${selectedPaths}`, 4000);
 }
 
 async function simpleCopy(
 	app: App,
 	file: TFile | TFolder,
-	selectedPath: string,
+	selectedPaths: string,
 	move: boolean
 ): Promise<void> {
-	const { filePath, destinationPath } = getDestinationPath(file, selectedPath);
+	const { filePath, destinationPath } = getDestinationPath(file, selectedPaths);
 	try {
 		await fs.copy(filePath, destinationPath);
 		if (move) {
@@ -103,31 +100,31 @@ async function handler(
 	app: App,
 	result: { pastOption: number; attached: TFile[] },
 	files: (TFile | TFolder)[],
-	selectedPath: string,
+	selectedPaths: string,
 	move: boolean
 ): Promise<void> {
 	const allFiles = [...new Set([...files, ...result.attached])];
 	for (const file of allFiles) {
-		await moveItem(app, file, selectedPath, result.pastOption, move);
+		await moveItem(app, file, selectedPaths, result.pastOption, move);
 	}
-	new Notice(`File(s) ${move ? 'moved' : 'copied'} to ${selectedPath}`, 4000);
+	new Notice(`File(s) ${move ? 'moved' : 'copied'} to ${selectedPaths}`, 4000);
 }
 
 async function moveItem(
 	app: App,
 	file: TFile | TFolder,
-	selectedPath: string,
+	selectedPaths: string,
 	pastOption: number,
 	move: boolean
 ): Promise<void> {
-	const { filePath, fileName, destinationPath } = getDestinationPath(file, selectedPath);
-	await makeCopy(app, file, fileName, selectedPath, filePath, destinationPath, pastOption, move);
+	const { filePath, fileName, destinationPath } = getDestinationPath(file, selectedPaths);
+	await makeCopy(app, file, fileName, selectedPaths, filePath, destinationPath, pastOption, move);
 }
 
-function getDestinationPath(file: TFile | TFolder, selectedPath: string) {
+function getDestinationPath(file: TFile | TFolder, selectedPaths: string) {
 	const filePath = this.app.vault.adapter.getFullPath(file.path);
 	const fileName = path.basename(filePath);
-	const destinationPath = path.join(selectedPath, fileName);
+	const destinationPath = path.join(selectedPaths, fileName);
 	return { filePath, fileName, destinationPath };
 }
 
@@ -135,7 +132,7 @@ async function makeCopy(
 	app: App,
 	file: TFile | TFolder,
 	fileName: string,
-	selectedPath: string,
+	selectedPaths: string,
 	normalizedFullPath: string,
 	destinationPath: string,
 	choice: number,
@@ -143,7 +140,7 @@ async function makeCopy(
 ): Promise<FileOperationResult> {
 	try {
 		if (choice === 2) {
-			destinationPath = await getIncrementedFilePath(selectedPath, fileName);
+			destinationPath = await getIncrementedFilePath(selectedPaths, fileName);
 		}
 		await fs.copy(normalizedFullPath, destinationPath);
 		if (move) {
@@ -157,7 +154,7 @@ async function makeCopy(
 	}
 }
 
-async function getIncrementedFilePath(selectedPath: string, fileName: string): Promise<string> {
+export async function getIncrementedFilePath(selectedPaths: string, fileName: string): Promise<string> {
 	const { name: baseFileName, ext: extension } = path.parse(fileName);
 	const regex = /^(.*) \((\d+)\)$/;
 	const match = baseFileName.match(regex);
@@ -169,11 +166,11 @@ async function getIncrementedFilePath(selectedPath: string, fileName: string): P
 		versionedFileName = `${match[1]} (${parseInt(match[2]) + 1})${extension}`;
 	} else {
 		versionedFileName = `${baseFileName} (${version})${extension}`;
-		while (await fs.pathExists(path.join(selectedPath, versionedFileName))) {
+		while (await fs.pathExists(path.join(selectedPaths, versionedFileName))) {
 			version++;
 			versionedFileName = `${baseFileName} (${version})${extension}`;
 		}
 	}
 
-	return path.join(selectedPath, versionedFileName);
+	return path.join(selectedPaths, versionedFileName);
 }

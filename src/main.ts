@@ -2,7 +2,6 @@
 // todo: copy vault profile. insert in UI
 
 import { Plugin } from "obsidian";
-import { addMovetoVault, registerMTVmenus } from "./move to vault/move-to-vault";
 import { ToolsSettingTab } from "./settings";
 import { registerSFD } from "./search from directory/search-from-directory";
 import { registerOutOfVault } from "./move out from vault/move-out-menus";
@@ -10,6 +9,7 @@ import { DEFAULT_SETTINGS } from "./types/variables";
 import { ToolsSettings } from "./types/global";
 import { migrateProfile } from "./migratetProfile";
 import { VaultChooser } from "./vaultsModal";
+import { addMoveToVault } from "./move to vault/move-to-vault";
 
 
 export default class Tools extends Plugin {
@@ -24,8 +24,7 @@ export default class Tools extends Plugin {
 		}
 
 		if (this.settings["move-to-vault"]) {
-			addMovetoVault.bind(this)()
-			registerMTVmenus.bind(this)()
+			addMoveToVault.bind(this)()
 		}
 
 		if (this.settings["search-from-directory"]) {

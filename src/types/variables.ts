@@ -1,5 +1,5 @@
+import { addMoveToVault } from "src/move to vault/move-to-vault";
 import { createMoveFilesMenuCallback, registerOutOfVault } from "../move out from vault/move-out-menus";
-import { addMovetoVault } from "../move to vault/move-to-vault";
 import { SfdToEditorMenuCb, SfdToFileMenuCb, registerSFD } from "../search from directory/search-from-directory";
 import { ToggleElement, ToolsSettings } from "./global";
 
@@ -28,7 +28,7 @@ export const settingsList: ToggleElement[] = [
         setting: "move-to-vault",
         callback: async function (value: boolean) {
             if (value) {
-                addMovetoVault.bind(this.plugin)()
+                addMoveToVault.bind(this.plugin)()
             } else {
                 const list = [
                     'obsidian-my-tools:move-files-to-vault', 'obsidian-my-tools:move-directory-to-vault', 'obsidian-my-tools:copy-files-to-vault', 'obsidian-my-tools:copy-directory-to-vault'

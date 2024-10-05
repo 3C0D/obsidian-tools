@@ -1,5 +1,5 @@
 import { Menu, MenuItem, TFile, TFolder } from "obsidian";
-import { movOpenFileExplorer } from "./copy-move-out-of-vault";
+import { moveOutOfVault } from "./copy-move-out-of-vault";
 
 export function registerOutOfVault(): void {
     this.registerEvent(
@@ -19,13 +19,13 @@ export function createMoveFilesMenuCallback() {
         addMenuItem(menu, {
             title: "Copy Out From Vault",
             icon: "copy",
-            callback: async () => await movOpenFileExplorer(fileArray, "copy")
+            callback: async () => await moveOutOfVault(fileArray, "copy")
         });
 
         addMenuItem(menu, {
             title: "Move Out From Vault",
             icon: "scissors",
-            callback: async () => await movOpenFileExplorer(fileArray, "move")
+            callback: async () => await moveOutOfVault(fileArray, "move")
         });
     };
 }

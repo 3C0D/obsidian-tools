@@ -15,7 +15,7 @@ export async function picker(
     message: string,
     properties: string[]
 ) {
-    const dirPath: string[] | undefined = window.electron.remote.dialog.showOpenDialogSync({
+    const dirPath = window.electron.remote.dialog.showOpenDialogSync({
         title: message,
         properties
     });
