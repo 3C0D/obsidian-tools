@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-sample-plugin-modif",
+	"name": "obsidian-my-tools",
 	"version": "1.0.0",
-	"description": "modified sample plugin",
+	"description": "import, export, move...",
 	"main": "main.js",
 	"scripts": {
 		"start": "npm i && cross-env REAL=0 node scripts/start.mjs",
@@ -33,6 +33,8 @@
 		"fs-extra": "^11.2.0",
 		"json-stringify-pretty-compact": "^4.0.0",
 		"semver": "^7.6.0",
-		"tsx": "^4.7.1"
-	}
+		"tsx": "^4.7.1",
+		"monkey-around": "^2.3.0",
+		"@popperjs/core": "^2.11.8"
+		}
 }
