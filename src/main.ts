@@ -1,4 +1,3 @@
-// todo: improve import files to vault. where? path
 // todo: copy vault profile. insert in UI
 
 import { Plugin } from "obsidian";

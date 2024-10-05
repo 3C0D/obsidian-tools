@@ -19,7 +19,6 @@ export class VaultChooser extends Modal {
             .addButton((btn) =>
                 btn
                     .setButtonText("Chose vault folder from explorer")
-                    .setCta()
                     .onClick(() => {
                         this.close();
                         this.onSubmit("");
@@ -42,9 +41,9 @@ export class VaultChooser extends Modal {
         new Setting(El)
             .setName(vaultName)
             .setDesc(vaultDir)
-            .addExtraButton(btn => {
+            .addButton(btn => {
                 btn
-                    .setIcon("check")
+                    .setIcon("checkmark")
                     .onClick(() => {
                         this.onSubmit(_path)
                     });
