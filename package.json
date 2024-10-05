@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-my-tools",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "import, export, move...",
 	"main": "main.js",
 	"scripts": {
@@ -36,5 +36,5 @@
 		"tsx": "^4.7.1",
 		"monkey-around": "^2.3.0",
 		"@popperjs/core": "^2.11.8"
-		}
+	}
 }
