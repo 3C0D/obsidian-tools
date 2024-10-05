@@ -1,33 +1,45 @@
 import { Menu, MenuItem, TFile, TFolder } from "obsidian";
 import { movOpenFileExplorer } from "./copy-move-out-of-vault";
 
-export function registerOutOfVault() {
+export function registerOutOfVault(): void {
     this.registerEvent(
-        this.app.workspace.on("file-menu", movFilesMenuCb())
+        this.app.workspace.on("file-menu", createMoveFilesMenuCallback())
     );
-    // move out from vault 1 file selection multi selection
     this.registerEvent(
-        this.app.workspace.on("files-menu", movFilesMenuCb())
+        this.app.workspace.on("files-menu", createMoveFilesMenuCallback())
     );
 }
 
-export function movFilesMenuCb() {
-    return (menu: Menu, files: (TFile | TFolder)[] | TFile | TFolder) => {
-        if (!Array.isArray(files)) files = [files]
+export function createMoveFilesMenuCallback() {
+    return (menu: Menu, files: TFile | TFolder | (TFile | TFolder)[]) => {
+        const fileArray = Array.isArray(files) ? files : [files];
+
         menu.addSeparator();
-        menu.addItem((item: MenuItem) => {
-            item.setTitle("Copy Out From Vault");
-            item.setIcon("copy");
-            item.onClick(async () => {
-                await movOpenFileExplorer(files as (TFile | TFolder)[], "copy");
-            });
+
+        addMenuItem(menu, {
+            title: "Copy Out From Vault",
+            icon: "copy",
+            callback: async () => await movOpenFileExplorer(fileArray, "copy")
         });
-        menu.addItem((item: MenuItem) => {
-            item.setTitle("Move Out From Vault");
-            item.setIcon("scissors");
-            item.onClick(async () => {
-                await movOpenFileExplorer(files as TFile[] | TFolder[], "move", true);
-            });
+
+        addMenuItem(menu, {
+            title: "Move Out From Vault",
+            icon: "scissors",
+            callback: async () => await movOpenFileExplorer(fileArray, "move")
         });
-    }
+    };
+}
+
+interface MenuItemOptions {
+    title: string;
+    icon: string;
+    callback: () => Promise<void>;
+}
+
+function addMenuItem(menu: Menu, options: MenuItemOptions): void {
+    menu.addItem((item: MenuItem) => {
+        item.setTitle(options.title)
+            .setIcon(options.icon)
+            .onClick(options.callback);
+    });
 }

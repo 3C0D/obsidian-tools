@@ -1,6 +1,8 @@
 import { App, Modal, Setting, TFile } from "obsidian";
 
 export class OutFromVaultConfirmModal extends Modal {
+	private attachedAfterToggle: TFile[];
+
 	constructor(
 		app: App,
 		public runModal: boolean,
@@ -8,7 +10,7 @@ export class OutFromVaultConfirmModal extends Modal {
 		public onSubmit: (result: { pastOption: number, attached: TFile[] } | null) => void
 	) {
 		super(app);
-		this.onSubmit = onSubmit;
+		this.attachedAfterToggle = attached;
 	}
 	onOpen() {
 		// modal size
@@ -16,66 +18,64 @@ export class OutFromVaultConfirmModal extends Modal {
 		this.modalEl.style.height = `350px`;
 
 		const { contentEl } = this;
-		this.contentEl.createEl("p", {
-			text: `Some files already exist.`,
-		});
-		this.contentEl.createEl("p", {
-			text: `choose your paste options:`,
-		});
-		let attachedAfterToggle: TFile[]
+		contentEl.empty();
+		contentEl.createEl("h2", { text: "Out of Vault Confirmation" });
 
 		if (this.attached.length) {
-			const newSetting = new Setting(this.contentEl);
-			newSetting
+			new Setting(contentEl)
 				.setName("Join attached resolved links")
 				.addToggle((toggle) => {
+					toggle.setValue(true)
 					toggle.onChange(async (value) => {
-						attachedAfterToggle = value ? this.attached: []
+						this.attachedAfterToggle = value ? this.attached : []
 					})
 				})
 		}
 		if (this.runModal) {
-			const newSetting = new Setting(this.contentEl);
-			newSetting
+			new Setting(contentEl)
+				.setName("Some files already exist.")
 				.addButton((b) => {
-					b.setButtonText("Paste")
+					b.setButtonText("Overwrite")
 						.setCta()
 						.setTooltip("overwrite existing files")
 						.onClick(async () => {
 							this.close();
-							this.onSubmit({ pastOption: 1, attached: attachedAfterToggle });
+							this.onSubmit({ pastOption: 1, attached: this.attachedAfterToggle });
 						});
 				})
 				.addButton((b) => {
-					b.setButtonText("Incremental Paste")
-						.setIcon("copy-plus")
+					b.setButtonText("Increment")
 						.setCta()
 						.setTooltip("increment path if file exists")
 						.onClick(async () => {
 							this.close();
-							this.onSubmit({ pastOption: 2, attached: attachedAfterToggle });
+							this.onSubmit({ pastOption: 2, attached: this.attachedAfterToggle });
 						});
 				});
 
-		} else {
-			if (this.attached) {
-				const newSetting = new Setting(this.contentEl);
-				newSetting
-					.addButton((b) => {
-						b.setButtonText("Valid")
-							.setCta()
-							.setTooltip("valid toggle option")
-							.onClick(async () => {
-								this.close();
-								this.onSubmit({ pastOption: 0, attached: attachedAfterToggle });
-							});
-					})
-			}
+		} else if (this.attached.length) {
+			new Setting(contentEl)
+				.addButton((b) => {
+					b.setButtonText("Proceed")
+						.setCta()
+						.setTooltip("Proceed with selected options")
+						.onClick(async () => {
+							this.close();
+							this.onSubmit({ pastOption: 0, attached: this.attachedAfterToggle });
+						});
+				})
 		}
+
+		new Setting(contentEl)
+			.addButton((b) => {
+				b.setButtonText("Cancel")
+					.onClick(() => {
+						this.close();
+					});
+			});
+
 	}
 	onClose() {
-		let { contentEl } = this;
-		contentEl.empty();
-		this.onSubmit(null);
+		this.contentEl.empty();
 	}
 }

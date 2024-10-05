@@ -15,8 +15,7 @@ export async function picker(
     message: string,
     properties: string[]
 ) {
-    let dirPath: string[]
-    dirPath = window.electron.remote.dialog.showOpenDialogSync({
+    const dirPath: string[] | undefined = window.electron.remote.dialog.showOpenDialogSync({
         title: message,
         properties
     });
@@ -32,7 +31,7 @@ export async function picker(
 //     else return result.filePaths[0];
 
 export async function openDirectoryInFileManager(dirPath: string) {
-    let shell = window.electron.remote.shell;
+    const shell = window.electron.remote.shell;
     try {
         await shell.openPath(dirPath);
     } catch (err) {

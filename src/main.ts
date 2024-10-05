@@ -1,11 +1,7 @@
 // todo: improve import files to vault. where? path
 // todo: copy vault profile. insert in UI
 
-import {
-	Plugin,
-	TFile,
-	TFolder,
-} from "obsidian";
+import { Plugin } from "obsidian";
 import { addMovetoVault, registerMTVmenus } from "./move to vault/move-to-vault";
 import { ToolsSettingTab } from "./settings";
 import { registerSFD } from "./search from directory/search-from-directory";
@@ -13,13 +9,11 @@ import { registerOutOfVault } from "./move out from vault/move-out-menus";
 import { DEFAULT_SETTINGS } from "./types/variables";
 import { ToolsSettings } from "./types/global";
 import { migrateProfile } from "./migratetProfile";
-import { VaultsSuggest } from "./suggest";
 import { VaultChooser } from "./vaultsModal";
 
 
 export default class Tools extends Plugin {
 	settings: ToolsSettings;
-	// files: TFile[] | TFolder[];
 
 	async onload() {
 		await this.loadSettings();
@@ -42,8 +36,8 @@ export default class Tools extends Plugin {
 			id: "import-vault-profile",
 			name: "import vault profile",
 			callback: async () => {
-				new VaultChooser(this.app, true,(result) => {
-					migrateProfile(this,true,result)
+				new VaultChooser(this.app, true, (result) => {
+					migrateProfile(this, true, result)
 				}).open()
 			},
 		});
@@ -51,7 +45,7 @@ export default class Tools extends Plugin {
 			id: "export-vault-profile",
 			name: "export vault profile",
 			callback: async () => {
-				new VaultChooser(this.app, false,(result) => {
+				new VaultChooser(this.app, false, (result) => {
 					migrateProfile(this, false, result)
 				}).open()
 			}

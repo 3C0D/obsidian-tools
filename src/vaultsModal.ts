@@ -24,31 +24,30 @@ export class VaultChooser extends Modal {
                         this.close();
                         this.onSubmit("");
                     }));
-                    
+
         vaultPaths.forEach((_path) => {
             this.createButtons(contentEl, _path)
         })
     }
 
     onClose() {
-        let { contentEl } = this;
-        contentEl.empty();
+        this.contentEl.empty();
     }
 
     createButtons(El: HTMLElement, _path: string) {
 
-    const vaultDir: string = path.dirname(_path);
-    const vaultName: string = path.basename(_path);
+        const vaultDir: string = path.dirname(_path);
+        const vaultName: string = path.basename(_path);
 
-    new Setting(El)
-        .setName(vaultName)
-        .setDesc(vaultDir)
-        .addExtraButton(btn => {
-            btn
-                .setIcon("check")
-                .onClick(() => {
-                    this.onSubmit(_path)
-                });
-        })
-}
+        new Setting(El)
+            .setName(vaultName)
+            .setDesc(vaultDir)
+            .addExtraButton(btn => {
+                btn
+                    .setIcon("check")
+                    .onClick(() => {
+                        this.onSubmit(_path)
+                    });
+            })
+    }
 }
