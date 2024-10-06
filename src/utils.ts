@@ -1,6 +1,6 @@
 import * as path from "path";
 import * as os from "os";
-import { Platform } from "obsidian";
+import { Notice, Platform } from "obsidian";
 import { readFileSync } from "fs"
 
 
@@ -49,7 +49,8 @@ function getVaultsConfig(): string | null {
     } else if (Platform.isLinux) {
         return path.join(userDir, '.config', 'obsidian', 'obsidian.json');
     } else {
-        console.log("should open explorer?")
+        console.error("platform not supported")
+        new Notice("platform not supported")
         return null
     }
 }
@@ -71,22 +72,28 @@ function readObsidianJson(): ObsidianJsonConfig | null {
         const vaultsConfigPath = getVaultsConfig();
         if (vaultsConfigPath) {
             const vaultsConfigContent = JSON.parse(readFileSync(vaultsConfigPath, "utf8"));
+            console.log("vaultsConfigContent", vaultsConfigContent)
             return vaultsConfigContent as ObsidianJsonConfig;
         } else {
             return null;
         }
     } catch (err) {
-        console.log(err);
+        if (err instanceof SyntaxError) {
+            console.error("Invalid JSON format in obsidian.json");
+        } else if (err instanceof Error) {
+            console.error("Error reading obsidian.json:", err.message);
+        }
         return null;
     }
 }
 
 function getAllVaultPaths(): string[] | null {
     const obsidianConfig = readObsidianJson();
+    const currentVaultPath = this.app.vault.adapter.basePath;
     if (obsidianConfig) {
         const paths: string[] = [];
         for (const key in obsidianConfig.vaults) {
-            if (Object.prototype.hasOwnProperty.call(obsidianConfig.vaults, key)) {
+            if (Object.prototype.hasOwnProperty.call(obsidianConfig.vaults, key) && obsidianConfig.vaults[key].path !== currentVaultPath) {
                 paths.push(obsidianConfig.vaults[key].path);
             }
         }

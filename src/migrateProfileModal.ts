@@ -10,33 +10,8 @@ export async function setMigrateOptions(
     message: string,
     isImport: boolean
 ): Promise<boolean> {
-    return await openMigrateModal(
-        this.app,
-        dirPath,
-        plugin,
-        message,
-        isImport
-    );
-}
-
-async function openMigrateModal(
-    app: App,
-    dirPath: string,
-    plugin: Tools,
-    message: string,
-    isImport: boolean,
-): Promise<boolean> {
-    return await new Promise((resolve) => {
-        new MigrateModal(
-            app,
-            dirPath,
-            plugin,
-            message,
-            (confirmed: boolean) => {
-                resolve(confirmed);
-            },
-            isImport
-        ).open();
+    return new Promise((resolve) => {
+        new MigrateModal(plugin.app, dirPath, plugin, message, resolve, isImport).open();
     });
 }
 
@@ -50,106 +25,94 @@ class MigrateModal extends Modal {
         public isImport: boolean
     ) {
         super(app);
-        this.getdir()
+        this.initializeDirPath();
+    }
+
+    private initializeDirPath() {
+        if (!this.isImport) {
+            //@ts-ignore
+            this.dirPath = this.app.vault.adapter.getFullPath('.obsidian');
+        }
     }
 
     async onOpen() {
         const { contentEl } = this;
         contentEl.empty();
-        contentEl.createEl("p").setText(this.message);
-        contentEl.createEl("p").setText("❗existing are replaced. others are kept");
+        contentEl.createEl('h2', { text: this.message });
+        contentEl.createEl('p', { text: '⚠️ Existing items will be replaced. Others will be kept.' });
 
-        this.getItems(true)//→ settings.vaultDirs
-        this.getItems(false)//→ settings.vaultFiles
+        this.updateVaultItems(true)
+        this.updateVaultItems(false)
 
-        this.createSettingsFromDirs();
-        this.createSettingsFromFiles();
+        this.createSettingsSection('Directories', this.plugin.settings.vaultDirs);
+        this.createSettingsSection('Files', this.plugin.settings.vaultFiles);
+
         await this.plugin.saveSettings()
 
         new Setting(this.contentEl)
-            .addButton((b) => {
-                b.setIcon("checkmark")
+            .addButton((btn) => {
+                btn.setButtonText('Confirm')
                     .setCta()
                     .onClick(() => {
                         this.callback(true);
                         this.close();
                     });
             })
-            .addExtraButton((b) =>
-                b.setIcon("cross").onClick(() => {
-                    this.callback(false);
-                    this.close();
-                })
-            );
+            .addButton((btn) =>
+                btn.setButtonText('Cancel')
+                    .onClick(() => {
+                        this.callback(false);
+                        this.close();
+                    }));
     }
 
-    createSettingsFromDirs() {
-        const dirSettings = this.plugin.settings.vaultDirs;
-        Object.keys(dirSettings).forEach(dirName => {
-            const dirPath = path.join(this.dirPath, dirName)
-            if (fs.existsSync(dirPath)) {
-                new Setting(this.contentEl)
-                    .setName(this.isImport ? `import ${dirName} ?` : `export ${dirName} ?`)
-                    .addToggle((toggle) => {
-                        toggle.setValue(dirSettings[dirName])
-                            .onChange(async (value) => {
-                                dirSettings[dirName] = value;
-                                await this.plugin.saveSettings();
-                            });
-                    });
-            }
-        });
-        new Setting(this.contentEl).settingEl.createEl("p")
-    }
+    private createSettingsSection(title: string, items: Record<string, boolean>): void {
+        const sectionEl = this.contentEl.createDiv();
+        sectionEl.createEl('h3', { text: title });
 
-    createSettingsFromFiles() {
-        const fileSettings = this.plugin.settings.vaultFiles;
-        Object.keys(fileSettings).forEach(fileName => {
-            const filePath = path.join(this.dirPath, fileName) + ".json"
-            if (fs.existsSync(filePath)) {
-                new Setting(this.contentEl)
-                    .setName(this.isImport ? `import ${fileName} ?` : `export ${fileName} ?`)
-                    .addToggle((toggle) => {
-                        toggle.setValue(fileSettings[fileName])
+        Object.entries(items).forEach(([name, isEnabled]) => {
+            const itemPath = path.join(this.dirPath, name + (title === 'Files' ? '.json' : ''));
+            if (fs.existsSync(itemPath)) {
+                new Setting(sectionEl)
+                    .setName(`${this.isImport ? 'Import' : 'Export'} ${name}${name === 'app' ? ' (General settings)' : ''}`)
+                    .addToggle((toggle) =>
+                        toggle.setValue(isEnabled)
                             .onChange(async (value) => {
-                                fileSettings[fileName] = value;
+                                items[name] = value;
                                 await this.plugin.saveSettings();
-                            });
-                    });
+                            }));
             }
         });
     }
 
-    getdir(){
-        //@ts-ignore
-        const obsidian = this.app.vault.adapter.getFullPath(".obsidian")
-        this.dirPath = this.isImport ? this.dirPath : obsidian
-    }
-
-    getItems(isDirectory: boolean) {
+    private updateVaultItems(isDirectory: boolean): void {
         const items = fs.readdirSync(this.dirPath)
             .filter(item => {
                 const itemPath = path.join(this.dirPath, item);
-                return isDirectory ? fs.statSync(itemPath).isDirectory() : (fs.statSync(itemPath).isFile() && path.extname(item) === ".json");
+                return isDirectory
+                    ? fs.statSync(itemPath).isDirectory()
+                    : (fs.statSync(itemPath).isFile() && path.extname(item) === '.json');
             });
 
         const vaultItems = isDirectory ? this.plugin.settings.vaultDirs : this.plugin.settings.vaultFiles;
-        const itemNames = items.map(item => path.parse(item).name)
+        const itemNames = items.map(item => path.parse(item).name);
 
-        for (const key of Object.keys(vaultItems)) {
+        // Remove items that no longer exist
+        Object.keys(vaultItems).forEach(key => {
             if (!itemNames.includes(key)) {
                 delete vaultItems[key];
             }
-        }
+        });
 
-        for (const name of itemNames) {
+        // Add new items
+        itemNames.forEach(name => {
             if (!(name in vaultItems)) {
-                vaultItems[name] = isDirectory ? (name === "plugins" ? false : true) : true;
+                vaultItems[name] = isDirectory ? (name !== 'plugins') : true;
             }
-        }
+        });
     }
 
-    onClose() {
+    onClose(): void {
         const { contentEl } = this;
         contentEl.empty();
     }
