@@ -11,15 +11,15 @@ export async function setMigrateOptions(
     isImport: boolean
 ): Promise<boolean> {
     return new Promise((resolve) => {
-        new MigrateModal(plugin.app, dirPath, plugin, message, resolve, isImport).open();
+        new MigrateModal(plugin, plugin.app, dirPath, message, resolve, isImport).open();
     });
 }
 
 class MigrateModal extends Modal {
     constructor(
+        public plugin: Tools,
         app: App,
         public dirPath: string,
-        public plugin: Tools,
         public message: string,
         public callback: ConfirmCallback,
         public isImport: boolean

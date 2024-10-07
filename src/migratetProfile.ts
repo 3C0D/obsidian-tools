@@ -36,20 +36,20 @@ export async function migrateProfile(plugin: Tools, isImport = true, customPath?
     }
 }
 
-async function getVaultDir(complement: string, isImport = true) {
+async function getVaultDir(complement: string, isImport = true): Promise<string | null> {
     const action = isImport ? 'source' : 'destination';
     const dir = await picker(`Select ${action} vault folder`, ['openDirectory']);
-    if (!dir) return
+    if (!dir) return null;
 
     const dirPath = path.join(dir as string, complement);
     if (!existsSync(dirPath)) {
         new Notice('Select a valid vault folder!', 2500);
-        return;
+        return null;
     }
     return dirPath;
 }
 
-async function importOrExportDirs(plugin: Tools, dirPath: string, isImport = true) {
+async function importOrExportDirs(plugin: Tools, dirPath: string, isImport = true): Promise<void> {
     const obsidian = this.app.vault.adapter.getFullPath(".obsidian")
     const { vaultDirs } = plugin.settings
 
@@ -65,7 +65,6 @@ async function importOrExportDirs(plugin: Tools, dirPath: string, isImport = tru
             } else {
                 await fs.copy(srcDir, destination);
             }
-            console.debug(`${key} ${isImport ? 'imported' : 'exported'}`);
         } catch (err) {
             console.error(`Error copying ${key}:`, err);
         }
@@ -109,7 +108,6 @@ async function importOrExportJsons(plugin: Tools, dirPath: string, isImport = tr
 
             const mergedContent = { ...destinationContent, ...sourceContent };
             await fs.writeJson(destinationPath, mergedContent, { spaces: 2 });
-            console.debug(`${key} ${isImport ? 'imported' : 'exported'}`);
         } catch (error) {
             console.error(`Error processing ${key}.json:`, error);
         }

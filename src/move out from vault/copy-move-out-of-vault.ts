@@ -121,7 +121,7 @@ async function moveItem(
 	await makeCopy(app, file, fileName, selectedPaths, filePath, destinationPath, pastOption, move);
 }
 
-function getDestinationPath(file: TFile | TFolder, selectedPaths: string) {
+function getDestinationPath(file: TFile | TFolder, selectedPaths: string): { filePath: string; fileName: string; destinationPath: string } {
 	const filePath = this.app.vault.adapter.getFullPath(file.path);
 	const fileName = path.basename(filePath);
 	const destinationPath = path.join(selectedPaths, fileName);
@@ -146,7 +146,6 @@ async function makeCopy(
 		if (move) {
 			await app.vault.trash(file, true);
 		}
-		console.debug("File was successfully copied as", destinationPath);
 		return { success: true };
 	} catch (error) {
 		console.error(`Error during file operation: ${error}`);

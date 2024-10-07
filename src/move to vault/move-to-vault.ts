@@ -9,32 +9,32 @@ export function addMoveToVault() {
     this.addCommand({
         id: 'move-files-to-vault',
         name: 'Move file(s) to Vault',
-        callback: () => {
-            moveToVault(false, true)
+        callback: async () => {
+            await moveToVault(false, true)
         }
     })
 
     this.addCommand({
         id: 'move-directory-to-vault',
         name: 'Move directory to Vault',
-        callback: () => {
-            moveToVault(true, true)
+        callback: async () => {
+            await moveToVault(true, true)
         }
     })
 
     this.addCommand({
         id: 'copy-files-to-vault',
         name: 'Copy file(s) to Vault',
-        callback: () => {
-            moveToVault(false, false)
+        callback: async () => {
+            await moveToVault(false, false)
         }
     })
 
     this.addCommand({
         id: 'copy-directory-to-vault',
         name: 'Copy directory to Vault',
-        callback: () => {
-            moveToVault(true, false)
+        callback: async () => {
+            await moveToVault(true, false)
         }
     })
 
@@ -106,7 +106,7 @@ function createMTVFolderMenu() {
                 item
                     .setTitle(title)
                     .setIcon(icon)
-                    .onClick(() => moveToVault(directory, move, folder.path));
+                    .onClick(async() => await moveToVault(directory, move, folder.path));
             });
         };
 

@@ -2,6 +2,8 @@ import * as path from "path";
 import * as os from "os";
 import { Notice, Platform } from "obsidian";
 import { readFileSync } from "fs"
+import { VaultChooser } from "./vaultsModal";
+import { migrateProfile } from "./migratetProfile";
 
 
 declare global {
@@ -103,4 +105,12 @@ function getAllVaultPaths(): string[] | null {
     }
 }
 
-export const vaultPaths = getAllVaultPaths()??[]
+export const vaultPaths = getAllVaultPaths() ?? []
+
+export function openVaultChooser(isImport: boolean) {
+    new VaultChooser(this.app, isImport, (result) => {
+        migrateProfile(this, isImport, result).catch((error) => {
+            console.error(`Error during ${isImport ? 'import' : 'export'}:`, error);
+        });
+    }).open();
+}
