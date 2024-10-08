@@ -4,14 +4,9 @@ import { App, Modal, Setting } from "obsidian";
 import Tools from "./main";
 import { ConfirmCallback } from "./types/global";
 
-export async function setMigrateOptions(
-    plugin: Tools,
-    dirPath: string,
-    message: string,
-    isImport: boolean
-): Promise<boolean> {
+export async function setMigrateOptions(plugin: Tools, app: App, dirPath: string, message: string, isImport: boolean): Promise<boolean> {
     return new Promise((resolve) => {
-        new MigrateModal(plugin, plugin.app, dirPath, message, resolve, isImport).open();
+        new MigrateModal(plugin, app, dirPath, message, resolve, isImport).open();
     });
 }
 
@@ -30,7 +25,6 @@ class MigrateModal extends Modal {
 
     private initializeDirPath() {
         if (!this.isImport) {
-            //@ts-ignore
             this.dirPath = this.app.vault.adapter.getFullPath('.obsidian');
         }
     }
@@ -41,8 +35,8 @@ class MigrateModal extends Modal {
         contentEl.createEl('h2', { text: this.message });
         contentEl.createEl('p', { text: '⚠️ Existing items will be replaced. Others will be kept.' });
 
-        this.updateVaultItems(true)
-        this.updateVaultItems(false)
+        await this.updateVaultItems(true)
+        await this.updateVaultItems(false)
 
         this.createSettingsSection('Directories', this.plugin.settings.vaultDirs);
         this.createSettingsSection('Files', this.plugin.settings.vaultFiles);
@@ -85,17 +79,12 @@ class MigrateModal extends Modal {
         });
     }
 
-    private updateVaultItems(isDirectory: boolean): void {
-        const items = fs.readdirSync(this.dirPath)
-            .filter(item => {
-                const itemPath = path.join(this.dirPath, item);
-                return isDirectory
-                    ? fs.statSync(itemPath).isDirectory()
-                    : (fs.statSync(itemPath).isFile() && path.extname(item) === '.json');
-            });
-
+    private async updateVaultItems(isDirectory: boolean): Promise<void> {
+        const items = await fs.readdir(this.dirPath, { withFileTypes: true });
         const vaultItems = isDirectory ? this.plugin.settings.vaultDirs : this.plugin.settings.vaultFiles;
-        const itemNames = items.map(item => path.parse(item).name);
+        const itemNames = items
+            .filter(item => isDirectory ? item.isDirectory() : (item.isFile() && path.extname(item.name) === '.json'))
+            .map(item => path.parse(item.name).name);
 
         // Remove items that no longer exist
         Object.keys(vaultItems).forEach(key => {

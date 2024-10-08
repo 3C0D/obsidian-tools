@@ -13,7 +13,7 @@ interface FileOperationResult {
 	error?: string;
 }
 
-export async function moveOutOfVault(files: (TFile | TFolder)[], job: "move" | "copy"): Promise<void> {
+export async function moveOutOfVault(app: App, files: (TFile | TFolder)[], job: "move" | "copy"): Promise<void> {
 	const msg = job === "move" ? MOVE_MESSAGE : COPY_MESSAGE;
 	const selectedPaths = await picker(msg, ["openDirectory"]) as string;
 	if (!selectedPaths || !selectedPaths.length) return;
@@ -22,69 +22,56 @@ export async function moveOutOfVault(files: (TFile | TFolder)[], job: "move" | "
 	const attached = new Set<TFile>();
 
 	for (const file of files) {
-		const links = await hasResolvedLinks(file)
+		const links = await hasResolvedLinks(app, file)
 		links.forEach((link) => attached.add(link));
-		if (await fileAlreadyInDest(file, selectedPaths)) {
+		if (await fileAlreadyInDest(app, file, selectedPaths)) {
 			runModal = true;
 		}
 	}
 
 	if (runModal || attached.size > 0) {
-		new OutFromVaultConfirmModal(this.app, true, Array.from(attached), async (result) => {
+		new OutFromVaultConfirmModal(app, true, Array.from(attached), async (result) => {
 			if (!result) {
 				return;
 			}
-			await handler(this.app, result, files, selectedPaths, job === "move");
+			await handler(app, result, files, selectedPaths, job === "move");
 			await openDirectoryInFileManager(selectedPaths);
 		}).open();
 	} else {
-		await withoutModal(this.app, files, selectedPaths, job === "move");
+		await withoutModal(app, files, selectedPaths, job === "move");
 		await openDirectoryInFileManager(selectedPaths);
 	}
 }
 
-async function hasResolvedLinks(file: TFile | TFolder): Promise<TFile[]> {
+async function hasResolvedLinks(app: App, file: TFile | TFolder): Promise<TFile[]> {
 	if (file instanceof TFolder) return [];
-	const fileLinks: Record<string, number> = this.app.metadataCache.resolvedLinks[file.path]
+	const fileLinks: Record<string, number> = app.metadataCache.resolvedLinks[file.path]
 	const paths = Object.keys(fileLinks)
 	if (!paths.length) return [];
 
 	const LinkFiles: TFile[] = [];
 	for (const path of paths) {
-		const linkFile = this.app.vault.getFileByPath(path);
+		const linkFile = app.vault.getFileByPath(path);
 		if (linkFile) LinkFiles.push(linkFile);
 	}
 
 	return LinkFiles;
 }
 
-async function fileAlreadyInDest(
-	file: TFile | TFolder,
-	selectedPaths: string
-): Promise<boolean> {
-	const { destinationPath } = getDestinationPath(file, selectedPaths);
+async function fileAlreadyInDest(app: App, file: TFile | TFolder, selectedPaths: string): Promise<boolean> {
+	const { destinationPath } = getDestinationPath(app, file, selectedPaths);
 	return fs.pathExists(destinationPath);
 }
 
-async function withoutModal(
-	app: App,
-	files: (TFile | TFolder)[],
-	selectedPaths: string,
-	move: boolean
-): Promise<void> {
+async function withoutModal(app: App, files: (TFile | TFolder)[], selectedPaths: string, move: boolean): Promise<void> {
 	for (const file of files) {
 		await simpleCopy(app, file, selectedPaths, move);
 	}
 	new Notice(`File(s) ${move ? 'moved' : 'copied'} to ${selectedPaths}`, 4000);
 }
 
-async function simpleCopy(
-	app: App,
-	file: TFile | TFolder,
-	selectedPaths: string,
-	move: boolean
-): Promise<void> {
-	const { filePath, destinationPath } = getDestinationPath(file, selectedPaths);
+async function simpleCopy(app: App, file: TFile | TFolder, selectedPaths: string, move: boolean): Promise<void> {
+	const { filePath, destinationPath } = getDestinationPath(app, file, selectedPaths);
 	try {
 		await fs.copy(filePath, destinationPath);
 		if (move) {
@@ -96,13 +83,7 @@ async function simpleCopy(
 	}
 }
 
-async function handler(
-	app: App,
-	result: { pastOption: number; attached: TFile[] },
-	files: (TFile | TFolder)[],
-	selectedPaths: string,
-	move: boolean
-): Promise<void> {
+async function handler(app: App, result: { pastOption: number; attached: TFile[] }, files: (TFile | TFolder)[], selectedPaths: string, move: boolean): Promise<void> {
 	const allFiles = [...new Set([...files, ...result.attached])];
 	for (const file of allFiles) {
 		await moveItem(app, file, selectedPaths, result.pastOption, move);
@@ -110,34 +91,19 @@ async function handler(
 	new Notice(`File(s) ${move ? 'moved' : 'copied'} to ${selectedPaths}`, 4000);
 }
 
-async function moveItem(
-	app: App,
-	file: TFile | TFolder,
-	selectedPaths: string,
-	pastOption: number,
-	move: boolean
-): Promise<void> {
-	const { filePath, fileName, destinationPath } = getDestinationPath(file, selectedPaths);
+async function moveItem(app: App, file: TFile | TFolder, selectedPaths: string, pastOption: number, move: boolean): Promise<void> {
+	const { filePath, fileName, destinationPath } = getDestinationPath(app, file, selectedPaths);
 	await makeCopy(app, file, fileName, selectedPaths, filePath, destinationPath, pastOption, move);
 }
 
-function getDestinationPath(file: TFile | TFolder, selectedPaths: string): { filePath: string; fileName: string; destinationPath: string } {
-	const filePath = this.app.vault.adapter.getFullPath(file.path);
+function getDestinationPath(app: App, file: TFile | TFolder, selectedPaths: string): { filePath: string; fileName: string; destinationPath: string } {
+	const filePath = app.vault.adapter.getFullPath(file.path);
 	const fileName = path.basename(filePath);
 	const destinationPath = path.join(selectedPaths, fileName);
 	return { filePath, fileName, destinationPath };
 }
 
-async function makeCopy(
-	app: App,
-	file: TFile | TFolder,
-	fileName: string,
-	selectedPaths: string,
-	normalizedFullPath: string,
-	destinationPath: string,
-	choice: number,
-	move: boolean
-): Promise<FileOperationResult> {
+async function makeCopy(app: App, file: TFile | TFolder, fileName: string, selectedPaths: string, normalizedFullPath: string, destinationPath: string, choice: number, move: boolean): Promise<FileOperationResult> {
 	try {
 		if (choice === 2) {
 			destinationPath = await getIncrementedFilePath(selectedPaths, fileName);

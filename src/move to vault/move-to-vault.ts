@@ -1,16 +1,16 @@
 import * as path from "path";
 import * as fs from "fs-extra";
 import { picker } from "src/utils";
-import { Menu, MenuItem, Notice, TFolder } from "obsidian";
+import { App, Menu, MenuItem, Notice, TFolder } from "obsidian";
 import { OutFromVaultConfirmModal } from "src/move out from vault/out-of-vault-confirm_modal";
 import { getIncrementedFilePath } from "src/move out from vault/copy-move-out-of-vault";
 
-export function addMoveToVault() {
+export function addMoveToVault(app: App) {
     this.addCommand({
         id: 'move-files-to-vault',
         name: 'Move file(s) to Vault',
         callback: async () => {
-            await moveToVault(false, true)
+            await moveToVault(app, false, true)
         }
     })
 
@@ -18,7 +18,7 @@ export function addMoveToVault() {
         id: 'move-directory-to-vault',
         name: 'Move directory to Vault',
         callback: async () => {
-            await moveToVault(true, true)
+            await moveToVault(app, true, true)
         }
     })
 
@@ -26,7 +26,7 @@ export function addMoveToVault() {
         id: 'copy-files-to-vault',
         name: 'Copy file(s) to Vault',
         callback: async () => {
-            await moveToVault(false, false)
+            await moveToVault(app, false, false)
         }
     })
 
@@ -34,15 +34,15 @@ export function addMoveToVault() {
         id: 'copy-directory-to-vault',
         name: 'Copy directory to Vault',
         callback: async () => {
-            await moveToVault(true, false)
+            await moveToVault(app, true, false)
         }
     })
 
-    this.registerEvent(this.app.workspace.on("file-menu", createMTVFolderMenu()));
+    this.registerEvent(app.workspace.on("file-menu", createMTVFolderMenu(app)));
 }
 
-export async function moveToVault(directory: boolean, move: boolean, postPath?: string): Promise<void> {
-    const vaultPath = this.app.vault.adapter.getBasePath();
+export async function moveToVault(app: App, directory: boolean, move: boolean, postPath?: string): Promise<void> {
+    const vaultPath = app.vault.adapter.getBasePath();
     const destinationPath = postPath ? path.join(vaultPath, postPath) : vaultPath;
 
     const msg = `Choose ${directory ? "dir(s)" : "file(s)"} to import`;
@@ -63,7 +63,7 @@ export async function moveToVault(directory: boolean, move: boolean, postPath?: 
     }
 
     if (runModal) {
-        new OutFromVaultConfirmModal(this.app, true, [], async (result) => {
+        new OutFromVaultConfirmModal(app, true, [], async (result) => {
             if (!result) return;
             await processFiles(selectedPaths, destinationPath, move, result.pastOption);
         }).open();
@@ -95,7 +95,7 @@ async function processFiles(selectedPaths: string[], destinationPath: string, mo
     }
 }
 
-function createMTVFolderMenu() {
+function createMTVFolderMenu(app: App) {
     return (menu: Menu, folder: TFolder) => {
         if (!(folder instanceof TFolder)) return;
 
@@ -106,7 +106,7 @@ function createMTVFolderMenu() {
                 item
                     .setTitle(title)
                     .setIcon(icon)
-                    .onClick(async() => await moveToVault(directory, move, folder.path));
+                    .onClick(async () => await moveToVault(app, directory, move, folder.path));
             });
         };
 

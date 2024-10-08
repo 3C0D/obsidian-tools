@@ -30,15 +30,15 @@ export default class Tools extends Plugin {
 
 	private initializeFeatures() {
 		if (this.settings['move-out-from-vault']) {
-			registerOutOfVault.call(this);
+			registerOutOfVault.call(this, this.app);
 		}
 
 		if (this.settings['move-to-vault']) {
-			addMoveToVault.call(this);
+			addMoveToVault.call(this, this.app);
 		}
 
 		if (this.settings['search-from-directory']) {
-			registerSFD.call(this);
+			registerSFD.call(this, this.app);
 		}
 	}
 
@@ -46,13 +46,13 @@ export default class Tools extends Plugin {
 		this.addCommand({
 			id: 'import-vault-profile',
 			name: 'Import vault profile',
-			callback: () => openVaultChooser.call(this, true),
+			callback: () => openVaultChooser.call(this, this.app, true),
 		});
 
 		this.addCommand({
 			id: 'export-vault-profile',
 			name: 'Export vault profile',
-			callback: () => openVaultChooser.call(this, false),	
+			callback: () => openVaultChooser.call(this, this.app, false),
 		});
 	}
 }

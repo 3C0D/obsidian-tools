@@ -1,10 +1,9 @@
 import * as path from "path";
 import * as os from "os";
-import { Notice, Platform } from "obsidian";
+import { App, Notice, Platform } from "obsidian";
 import { readFileSync } from "fs"
 import { VaultChooser } from "./vaultsModal";
 import { migrateProfile } from "./migratetProfile";
-
 
 declare global {
     interface Window {
@@ -13,10 +12,7 @@ declare global {
     }
 }
 
-export async function picker(
-    message: string,
-    properties: string[]
-) {
+export async function picker(message: string, properties: string[]) {
     const dirPath = window.electron.remote.dialog.showOpenDialogSync({
         title: message,
         properties
@@ -25,12 +21,6 @@ export async function picker(
     if (properties.includes("multiSelections")) return dirPath
     else return dirPath[0];
 }
-
-// other way...
-//     const result = await window.electron.remote.dialog.showOpenDialog(window.electron.remote.getCurrentWindow(), dialogOptions);
-//     if (result.canceled) return '';
-//     if (properties.includes('multiSelections')) return result.filePaths;
-//     else return result.filePaths[0];
 
 export async function openDirectoryInFileManager(dirPath: string) {
     const shell = window.electron.remote.shell;
@@ -89,9 +79,9 @@ function readObsidianJson(): ObsidianJsonConfig | null {
     }
 }
 
-function getAllVaultPaths(): string[] | null {
+export function getVaultPaths(app: App): string[] {
     const obsidianConfig = readObsidianJson();
-    const currentVaultPath = this.app.vault.adapter.basePath;
+    const currentVaultPath = app.vault.adapter.basePath;
     if (obsidianConfig) {
         const paths: string[] = [];
         for (const key in obsidianConfig.vaults) {
@@ -100,16 +90,13 @@ function getAllVaultPaths(): string[] | null {
             }
         }
         return paths;
-    } else {
-        return null;
     }
+    return [];
 }
 
-export const vaultPaths = getAllVaultPaths() ?? []
-
-export function openVaultChooser(isImport: boolean) {
-    new VaultChooser(this.app, isImport, (result) => {
-        migrateProfile(this, isImport, result).catch((error) => {
+export function openVaultChooser(app: App, isImport: boolean) {
+    new VaultChooser(app, isImport, (result) => {
+        migrateProfile(this, app, isImport, result).catch((error) => {
             console.error(`Error during ${isImport ? 'import' : 'export'}:`, error);
         });
     }).open();

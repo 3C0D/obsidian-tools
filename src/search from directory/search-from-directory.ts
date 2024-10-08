@@ -1,11 +1,11 @@
-import { Editor, Menu, MenuItem, TFolder } from "obsidian";
+import { App, Editor, Menu, MenuItem, TFolder } from "obsidian";
 
-export function registerSFD() {
-  this.registerEvent( this.app.workspace.on("file-menu", SfdToFileMenuCb()));
-  this.registerEvent(this.app.workspace.on("editor-menu", SfdToEditorMenuCb()));
+export function registerSFD(app: App) {
+  this.registerEvent(app.workspace.on("file-menu", SfdToFileMenuCb(app)));
+  this.registerEvent(app.workspace.on("editor-menu", SfdToEditorMenuCb(app)));
 }
 
-export function SfdToFileMenuCb() {
+export function SfdToFileMenuCb(app: App) {
   return (menu: Menu, folder: TFolder) => {
     if (!(folder instanceof TFolder)) return;
     menu.addSeparator();
@@ -14,29 +14,29 @@ export function SfdToFileMenuCb() {
         .setTitle("Search in folder")
         .setIcon("search")
         .onClick(async () => {
-          await searchDir(folder);
+          await searchDir(app, folder);
         });
     });
   }
 }
 
-export function SfdToEditorMenuCb() {
+export function SfdToEditorMenuCb(app: App) {
   return (menu: Menu, editor: Editor) => {
     menu.addItem((item) => {
       item
         .setTitle("search in parent directory")
         .setIcon("search")
-        .onClick(async (evt) => {
+        .onClick(async () => {
           const selection = editor.getSelection();
-          await searchDir(null, selection, true);
+          await searchDir(app, null, selection, true);
         });
     });
   }
 }
 
-async function searchDir(folder: TFolder | null, selection = "", select = false) {
+async function searchDir(app: App, folder: TFolder | null, selection = "", select = false) {
   let prefix;
-  const { workspace } = this.app
+  const { workspace } = app
 
   if (folder) {
     const folderPath = folder.path;
@@ -50,9 +50,9 @@ async function searchDir(folder: TFolder | null, selection = "", select = false)
       prefix = "";//root
     }
   }
-  this.app.internalPlugins
-    .getPluginById("global-search")
-    .instance.openGlobalSearch(prefix + selection);
+
+  (app.internalPlugins.getPluginById("global-search")?.instance as any)?.openGlobalSearch(prefix + selection);
+
 
   // ensure text has been entered into the search input
   const searchLeaf = workspace.getLeavesOfType('search')[0];

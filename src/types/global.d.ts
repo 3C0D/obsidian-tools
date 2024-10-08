@@ -1,3 +1,6 @@
+import { App } from "obsidian";
+import Tools from "src/main";
+
 interface toToggle {
     "move-out-from-vault": boolean;
     "move-to-vault": boolean;
@@ -9,26 +12,10 @@ interface ToolsSettings extends toToggle {
     vaultFiles: Record<string, boolean>
 }
 
-interface ToggleElement {
+export interface ToggleElement {
     setting: string;
-    callback: (value: boolean) => Promise<void>;
-    name: string
+    callback: (app: App, plugin: Tools, value: boolean) => Promise<void>;
+    name: string;
 }
 
 export type ConfirmCallback = (confirmed: boolean) => void;
-
-
-
-
-
-
-// import 'obsidian'
-// declare module "obsidian" {
-//     interface App {
-//         commands: {
-//             executeCommandById(id: string, event?: Event): void,
-//             executeCommand(): void
-//             commands: Record<string, Command>
-//         }
-//     }
-// }

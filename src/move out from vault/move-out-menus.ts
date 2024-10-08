@@ -1,16 +1,16 @@
-import { Menu, MenuItem, TFile, TFolder } from "obsidian";
+import { App, Menu, MenuItem, TFile, TFolder } from "obsidian";
 import { moveOutOfVault } from "./copy-move-out-of-vault";
 
-export function registerOutOfVault(): void {
+export function registerOutOfVault(app: App): void {
     this.registerEvent(
-        this.app.workspace.on("file-menu", createMoveFilesMenuCallback())
+        this.app.workspace.on("file-menu", createMoveFilesMenuCallback(app))
     );
     this.registerEvent(
-        this.app.workspace.on("files-menu", createMoveFilesMenuCallback())
+        this.app.workspace.on("files-menu", createMoveFilesMenuCallback(app))
     );
 }
 
-export function createMoveFilesMenuCallback() {
+export function createMoveFilesMenuCallback(app: App) {
     return (menu: Menu, files: TFile | TFolder | (TFile | TFolder)[]) => {
         const fileArray = Array.isArray(files) ? files : [files];
 
@@ -19,13 +19,13 @@ export function createMoveFilesMenuCallback() {
         addMenuItem(menu, {
             title: "Copy Out From Vault",
             icon: "copy",
-            callback: async () => await moveOutOfVault(fileArray, "copy")
+            callback: async () => await moveOutOfVault(app, fileArray, "copy")
         });
 
         addMenuItem(menu, {
             title: "Move Out From Vault",
             icon: "scissors",
-            callback: async () => await moveOutOfVault(fileArray, "move")
+            callback: async () => await moveOutOfVault(app, fileArray, "move")
         });
     };
 }

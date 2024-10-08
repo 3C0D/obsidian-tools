@@ -28,7 +28,7 @@ export class ToolsSettingTab extends PluginSettingTab {
                         .onChange(async (value) => {
                             this.plugin.settings[el.setting as keyof toToggle] = value
                             await this.plugin.saveSettings()
-                            await el.callback.bind(this)(value)
+                            await el.callback.call(this, this.app, this.plugin, value)
                         })
                 }).setName(el.name)
         }

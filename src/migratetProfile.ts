@@ -1,30 +1,29 @@
 import * as path from "path";
 import * as fs from "fs-extra";
 import { picker } from "./utils";
-import { existsSync } from "fs-extra";
-import { Notice } from "obsidian";
+import { App, Notice } from "obsidian";
 import Tools from "./main";
 import { setMigrateOptions } from "./migrateProfileModal";
 
-export async function migrateProfile(plugin: Tools, isImport = true, customPath?: string): Promise<void> {
+export async function migrateProfile(plugin: Tools, app: App, isImport = true, customPath?: string): Promise<void> {
     try {
         const sourceOrDest = customPath ? path.join(customPath, '.obsidian') : await getVaultDir('.obsidian', isImport);
         if (!sourceOrDest) return
 
         const action = isImport ? 'Import' : 'Export';
-        const res = await setMigrateOptions(plugin, sourceOrDest, `${action} vault options`, isImport);
+        const res = await setMigrateOptions(plugin, app, sourceOrDest, `${action} vault options`, isImport);
 
         if (res) {
             await Promise.all([
-                importOrExportDirs(plugin, sourceOrDest, isImport),
-                importOrExportJsons(plugin, sourceOrDest, isImport)
+                importOrExportDirs(plugin, app, sourceOrDest, isImport),
+                importOrExportJsons(plugin, app, sourceOrDest, isImport)
             ]);
 
             if (isImport) {
                 // reload app
                 new Notice("Success!, App will reload...")
                 setTimeout(async () => {
-                    await this.app.commands.executeCommandById("app:reload")
+                    app.commands.executeCommandById("app:reload")
                 }, 1500);
             } else {
                 new Notice(`${action} operations finished successfully`);
@@ -42,15 +41,16 @@ async function getVaultDir(complement: string, isImport = true): Promise<string 
     if (!dir) return null;
 
     const dirPath = path.join(dir as string, complement);
-    if (!existsSync(dirPath)) {
+    if (!await fs.pathExists(dirPath)) {
         new Notice('Select a valid vault folder!', 2500);
         return null;
     }
     return dirPath;
 }
 
-async function importOrExportDirs(plugin: Tools, dirPath: string, isImport = true): Promise<void> {
-    const obsidian = this.app.vault.adapter.getFullPath(".obsidian")
+
+async function importOrExportDirs(plugin: Tools, app: App, dirPath: string, isImport = true): Promise<void> {
+    const obsidian = app.vault.adapter.getFullPath(".obsidian")
     const { vaultDirs } = plugin.settings
 
     for (const [key, isEnabled] of Object.entries(vaultDirs)) {
@@ -88,8 +88,8 @@ async function copyPlugins(src: string, dest: string): Promise<void> {
     }
 }
 
-async function importOrExportJsons(plugin: Tools, dirPath: string, isImport = true): Promise<void> {
-    const obsidian = this.app.vault.adapter.getFullPath(".obsidian")
+async function importOrExportJsons(plugin: Tools, app: App, dirPath: string, isImport = true): Promise<void> {
+    const obsidian = app.vault.adapter.getFullPath(".obsidian")
     const { vaultFiles } = plugin.settings;
 
     for (const [key, isEnabled] of Object.entries(vaultFiles)) {
