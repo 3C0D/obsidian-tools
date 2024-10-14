@@ -15,10 +15,10 @@ export class ToolsSettingTab extends PluginSettingTab {
         const { containerEl: El } = this;
         El.empty();
         El.createEl("h2", { text: "Tools" });
-        this.addToggleHandler(El, settingsList)
+        this.addSettingsToggleHandlers(El, settingsList)
     }
 
-    addToggleHandler(El: HTMLElement, settingsList: ToggleElement[]) {
+    addSettingsToggleHandlers(El: HTMLElement, settingsList: ToggleElement[]) {
         for (const el of settingsList) {
             const setting = new Setting(El)
             setting

@@ -7,7 +7,7 @@ import { registerOutOfVault } from "./move out from vault/move-out-menus";
 import { DEFAULT_SETTINGS } from "./types/variables";
 import { ToolsSettings } from "./types/global";
 import { addMoveToVault } from "./move to vault/move-to-vault";
-import { openVaultChooser } from "./utils";
+import { showVaultChooserModal } from "./utils";
 
 export default class Tools extends Plugin {
 	settings: ToolsSettings;
@@ -16,8 +16,8 @@ export default class Tools extends Plugin {
 		await this.loadSettings();
 		this.addSettingTab(new ToolsSettingTab(this.app, this));
 
-		this.initializeFeatures();
-		this.registerCommands();
+		this.initializeFeaturesBasedOnSettings();
+		this.registerPluginCommands();
 	}
 
 	private async loadSettings() {
@@ -28,7 +28,7 @@ export default class Tools extends Plugin {
 		await this.saveData(this.settings);
 	}
 
-	private initializeFeatures() {
+	private initializeFeaturesBasedOnSettings() {
 		if (this.settings['move-out-from-vault']) {
 			registerOutOfVault.call(this, this.app);
 		}
@@ -42,17 +42,17 @@ export default class Tools extends Plugin {
 		}
 	}
 
-	private registerCommands() {
+	private registerPluginCommands() {
 		this.addCommand({
 			id: 'import-vault-profile',
 			name: 'Import vault profile',
-			callback: () => openVaultChooser.call(this, this.app, true),
+			callback: () => showVaultChooserModal.call(this, this.app, true),
 		});
 
 		this.addCommand({
 			id: 'export-vault-profile',
 			name: 'Export vault profile',
-			callback: () => openVaultChooser.call(this, this.app, false),
+			callback: () => showVaultChooserModal.call(this, this.app, false),
 		});
 	}
 }

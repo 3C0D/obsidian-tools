@@ -3,20 +3,20 @@ import * as fs from "fs-extra";
 import { picker } from "./utils";
 import { App, Notice } from "obsidian";
 import Tools from "./main";
-import { setMigrateOptions } from "./migrateProfileModal";
+import { openMigrateModal } from "./migrateProfileModal";
 
 export async function migrateProfile(plugin: Tools, app: App, isImport = true, customPath?: string): Promise<void> {
     try {
-        const sourceOrDest = customPath ? path.join(customPath, '.obsidian') : await getVaultDir('.obsidian', isImport);
+        const sourceOrDest = customPath ? path.join(customPath, '.obsidian') : await getVaultDirPath('.obsidian', isImport);
         if (!sourceOrDest) return
 
         const action = isImport ? 'Import' : 'Export';
-        const res = await setMigrateOptions(plugin, app, sourceOrDest, `${action} vault options`, isImport);
+        const res = await openMigrateModal(plugin, app, sourceOrDest, `${action} vault options`, isImport);
 
         if (res) {
             await Promise.all([
-                importOrExportDirs(plugin, app, sourceOrDest, isImport),
-                importOrExportJsons(plugin, app, sourceOrDest, isImport)
+                migrateVaultDirectories(plugin, app, sourceOrDest, isImport),
+                migrateVaultJsonFiles(plugin, app, sourceOrDest, isImport)
             ]);
 
             if (isImport) {
@@ -35,7 +35,7 @@ export async function migrateProfile(plugin: Tools, app: App, isImport = true, c
     }
 }
 
-async function getVaultDir(complement: string, isImport = true): Promise<string | null> {
+async function getVaultDirPath(complement: string, isImport = true): Promise<string | null> {
     const action = isImport ? 'source' : 'destination';
     const dir = await picker(`Select ${action} vault folder`, ['openDirectory']);
     if (!dir) return null;
@@ -49,7 +49,7 @@ async function getVaultDir(complement: string, isImport = true): Promise<string 
 }
 
 
-async function importOrExportDirs(plugin: Tools, app: App, dirPath: string, isImport = true): Promise<void> {
+async function migrateVaultDirectories(plugin: Tools, app: App, dirPath: string, isImport = true): Promise<void> {
     const obsidian = app.vault.adapter.getFullPath(".obsidian")
     const { vaultDirs } = plugin.settings
 
@@ -61,7 +61,7 @@ async function importOrExportDirs(plugin: Tools, app: App, dirPath: string, isIm
 
         try {
             if (key === 'plugins') {
-                await copyPlugins(srcDir, destination);
+                await copyPluginDirectory(srcDir, destination);
             } else {
                 await fs.copy(srcDir, destination);
             }
@@ -71,7 +71,7 @@ async function importOrExportDirs(plugin: Tools, app: App, dirPath: string, isIm
     }
 }
 
-async function copyPlugins(src: string, dest: string): Promise<void> {
+async function copyPluginDirectory(src: string, dest: string): Promise<void> {
     await fs.ensureDir(dest);
     const files = await fs.readdir(src);
 
@@ -81,14 +81,14 @@ async function copyPlugins(src: string, dest: string): Promise<void> {
         const fileStats = await fs.stat(srcPath);
 
         if (fileStats.isDirectory() && file !== 'node_modules') {
-            await copyPlugins(srcPath, destPath);
+            await copyPluginDirectory(srcPath, destPath);
         } else if (fileStats.isFile()) {
             await fs.copy(srcPath, destPath);
         }
     }
 }
 
-async function importOrExportJsons(plugin: Tools, app: App, dirPath: string, isImport = true): Promise<void> {
+async function migrateVaultJsonFiles(plugin: Tools, app: App, dirPath: string, isImport = true): Promise<void> {
     const obsidian = app.vault.adapter.getFullPath(".obsidian")
     const { vaultFiles } = plugin.settings;
 
@@ -113,4 +113,3 @@ async function importOrExportJsons(plugin: Tools, app: App, dirPath: string, isI
         }
     }
 }
-

@@ -25,7 +25,7 @@ export class VaultChooser extends Modal {
                     }));
 
         getVaultPaths(this.app).forEach((_path) => {
-            this.createButtons(contentEl, _path)
+            this.createVaultButtons(contentEl, _path)
         })
     }
 
@@ -33,7 +33,7 @@ export class VaultChooser extends Modal {
         this.contentEl.empty();
     }
 
-    createButtons(El: HTMLElement, _path: string) {
+    createVaultButtons(El: HTMLElement, _path: string) {
 
         const vaultDir: string = path.dirname(_path);
         const vaultName: string = path.basename(_path);

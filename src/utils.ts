@@ -27,12 +27,12 @@ export async function openDirectoryInFileManager(dirPath: string) {
     try {
         await shell.openPath(dirPath);
     } catch (err) {
-        console.log(err);
+        console.error(err);
     }
 }
 
 
-function getVaultsConfig(): string | null {
+function getVaultsConfigPath(): string | null {
     const userDir: string = os.homedir();
     if (Platform.isWin) {
         return path.join(userDir, 'AppData', 'Roaming', 'obsidian', 'obsidian.json');
@@ -59,12 +59,11 @@ interface ObsidianJsonConfig {
     insider?: boolean;
 }
 
-function readObsidianJson(): ObsidianJsonConfig | null {
+function readObsidianConfig(): ObsidianJsonConfig | null {
     try {
-        const vaultsConfigPath = getVaultsConfig();
+        const vaultsConfigPath = getVaultsConfigPath();
         if (vaultsConfigPath) {
             const vaultsConfigContent = JSON.parse(readFileSync(vaultsConfigPath, "utf8"));
-            console.log("vaultsConfigContent", vaultsConfigContent)
             return vaultsConfigContent as ObsidianJsonConfig;
         } else {
             return null;
@@ -80,7 +79,7 @@ function readObsidianJson(): ObsidianJsonConfig | null {
 }
 
 export function getVaultPaths(app: App): string[] {
-    const obsidianConfig = readObsidianJson();
+    const obsidianConfig = readObsidianConfig();
     const currentVaultPath = app.vault.adapter.basePath;
     if (obsidianConfig) {
         const paths: string[] = [];
@@ -94,7 +93,7 @@ export function getVaultPaths(app: App): string[] {
     return [];
 }
 
-export function openVaultChooser(app: App, isImport: boolean) {
+export function showVaultChooserModal(app: App, isImport: boolean) {
     new VaultChooser(app, isImport, (result) => {
         migrateProfile(this, app, isImport, result).catch((error) => {
             console.error(`Error during ${isImport ? 'import' : 'export'}:`, error);

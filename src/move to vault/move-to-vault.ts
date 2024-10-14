@@ -1,7 +1,7 @@
 import * as path from "path";
 import * as fs from "fs-extra";
 import { picker } from "src/utils";
-import { App, Menu, MenuItem, Notice, TFolder } from "obsidian";
+import { App, Menu, MenuItem, Notice, TFile, TFolder } from "obsidian";
 import { OutFromVaultConfirmModal } from "src/move out from vault/out-of-vault-confirm_modal";
 import { getIncrementedFilePath } from "src/move out from vault/copy-move-out-of-vault";
 
@@ -97,22 +97,35 @@ async function processFiles(selectedPaths: string[], destinationPath: string, mo
 
 function createMTVFolderMenu(app: App) {
     return (menu: Menu, folder: TFolder) => {
-        if (!(folder instanceof TFolder)) return;
+        const isRootFile = folder instanceof TFile && folder.parent?.path === "/";
+        const isFolder = folder instanceof TFolder;
+
+        if (!isRootFile && !isFolder) return;
 
         menu.addSeparator();
 
-        const addMenuItem = (title: string, icon: string, directory: boolean, move: boolean) => {
-            menu.addItem((item: MenuItem) => {
-                item
-                    .setTitle(title)
-                    .setIcon(icon)
-                    .onClick(async () => await moveToVault(app, directory, move, folder.path));
-            });
-        };
-
-        addMenuItem("Copy file(s) to folder", "copy", false, false);
-        addMenuItem("Move file(s) to folder", "scissors", false, true);
-        addMenuItem("Copy dir(s) to folder", "copy", true, false);
-        addMenuItem("Move dir(s) to folder", "scissors", true, true);
-    };
+        menu.addItem(async (item) => {
+            item.setTitle("Import to folder").setIcon("folder-input");
+            const submenu = item.setSubmenu();
+            const addSubMenuItem = (title: string, icon: string, directory: boolean, move: boolean) => {
+                submenu.addItem((item: MenuItem) => {
+                    item
+                        .setTitle(title)
+                        .setIcon(icon)
+                        .onClick(async () => await moveToVault(app, directory, move, folder.path));
+                });
+            };
+            submenu.addItem((item) => {
+                item.setIsLabel(true).setTitle("Import file(s)");
+            })
+            addSubMenuItem("Copy", "copy", false, false);
+            addSubMenuItem("Cut", "scissors", false, true);
+            submenu.addSeparator();
+            submenu.addItem((item) => {
+                item.setIsLabel(true).setTitle("Import folder(s)");
+            })
+            addSubMenuItem("Copy", "copy", true, false);
+            addSubMenuItem("Cut", "scissors", true, true);
+        })
+    }
 }

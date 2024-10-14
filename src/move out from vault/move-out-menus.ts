@@ -17,13 +17,13 @@ export function createMoveFilesMenuCallback(app: App) {
         menu.addSeparator();
 
         addMenuItem(menu, {
-            title: "Copy Out From Vault",
+            title: "Copy out from Vault",
             icon: "copy",
             callback: async () => await moveOutOfVault(app, fileArray, "copy")
         });
 
         addMenuItem(menu, {
-            title: "Move Out From Vault",
+            title: "Move out from Vault",
             icon: "scissors",
             callback: async () => await moveOutOfVault(app, fileArray, "move")
         });

@@ -1,3 +1,26 @@
+**# obsidian-tools**
+
+## Import/export Vault Profile:
+- You can check what you want to import/export. Mainly: themes, snippets, plugins[^1], prefs, hotkeys,...
+- Existing JSON files and folders are updated. Kind of sync...
+
+## Move/Copy File(s)/Dir(s) out of Vault[^2][^3]:
+- With options to replace or increment existing file(s)/dir(s) and to copy resolved links at the same time (md, jpg...).  
+
+## Import to folder:
+- Move/Copy File(s)/Dir(s) To Vault or folder (folder context menu) with options to replace or increment existing file(s)/dir(s)
+- You can find the menu on folders 
+- On files in the root folder of the vault too. I'm doing this because the root folder is not in the tree explorer anymore 🥹. Or run the command Move/Copy File(s)/Dir(s) To Vault in the palette.
+
+Additional features:
+- Added search from directory improved (by Liam)
+- Each part of the plugin can be disabled in settings.
+
+[^1]: For developpers, copying plugins won't copy node-modules folders, so cloned repo will be copied super fast.
+[^2]: You can select several files holding alt.
+[^3]: The destination folder is opened at the end to check results...
+
+
 # obsidian-tools
 
 New: 
@@ -15,7 +38,7 @@ For repeat last command, it's there now https://github.com/1C0D/obsidian-repeat-
   with options to replace or increment existing file(s)/dir(s)   
   and to copy resolved links too (md, jpg...) 
 --- 
-- Move/Copy File(s)/Dir(s) To Vault or folder (folder context menu)
+- Import to folder: Move/Copy File(s)/Dir(s) To Vault or folder (folder context menu). You can find the menu on folders. and on files in the root folder of the vault too. I'm doing this because the root folder is not in the tree anymore 🥹. Or run the command  Move/Copy File(s)/Dir(s) To Vault in the palette.
 ---
 - added search from directory improved (by Liam)
 ---

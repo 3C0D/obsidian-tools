@@ -4,7 +4,7 @@ import { App, Modal, Setting } from "obsidian";
 import Tools from "./main";
 import { ConfirmCallback } from "./types/global";
 
-export async function setMigrateOptions(plugin: Tools, app: App, dirPath: string, message: string, isImport: boolean): Promise<boolean> {
+export async function openMigrateModal(plugin: Tools, app: App, dirPath: string, message: string, isImport: boolean): Promise<boolean> {
     return new Promise((resolve) => {
         new MigrateModal(plugin, app, dirPath, message, resolve, isImport).open();
     });
@@ -20,10 +20,10 @@ class MigrateModal extends Modal {
         public isImport: boolean
     ) {
         super(app);
-        this.initializeDirPath();
+        this.initializeDestinationDirPath();
     }
 
-    private initializeDirPath() {
+    private initializeDestinationDirPath() {
         if (!this.isImport) {
             this.dirPath = this.app.vault.adapter.getFullPath('.obsidian');
         }
@@ -35,11 +35,11 @@ class MigrateModal extends Modal {
         contentEl.createEl('h2', { text: this.message });
         contentEl.createEl('p', { text: '⚠️ Existing items will be replaced. Others will be kept.' });
 
-        await this.updateVaultItems(true)
-        await this.updateVaultItems(false)
+        await this.updateVaultItemsList(true)
+        await this.updateVaultItemsList(false)
 
-        this.createSettingsSection('Directories', this.plugin.settings.vaultDirs);
-        this.createSettingsSection('Files', this.plugin.settings.vaultFiles);
+        this.createMigrateSettingsSection('Directories', this.plugin.settings.vaultDirs);
+        this.createMigrateSettingsSection('Files', this.plugin.settings.vaultFiles);
 
         await this.plugin.saveSettings()
 
@@ -60,7 +60,7 @@ class MigrateModal extends Modal {
                     }));
     }
 
-    private createSettingsSection(title: string, items: Record<string, boolean>): void {
+    private createMigrateSettingsSection(title: string, items: Record<string, boolean>): void {
         const sectionEl = this.contentEl.createDiv();
         sectionEl.createEl('h3', { text: title });
 
@@ -79,7 +79,7 @@ class MigrateModal extends Modal {
         });
     }
 
-    private async updateVaultItems(isDirectory: boolean): Promise<void> {
+    private async updateVaultItemsList(isDirectory: boolean): Promise<void> {
         const items = await fs.readdir(this.dirPath, { withFileTypes: true });
         const vaultItems = isDirectory ? this.plugin.settings.vaultDirs : this.plugin.settings.vaultFiles;
         const itemNames = items
