@@ -52,5 +52,5 @@ export const settingsList: ToggleElement[] = [
             }
         },
         name: "move out from vault (when turned off a reload is done)"
-    },
+    }
 ]
