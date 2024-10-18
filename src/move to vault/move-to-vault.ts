@@ -97,7 +97,7 @@ async function processFiles(selectedPaths: string[], destinationPath: string, mo
 
 function createMTVFolderMenu(app: App) {
     return (menu: Menu, folder: TFolder) => {
-        const isRootFile = folder instanceof TFile && folder.isRoot();
+        const isRootFile = folder instanceof TFile && folder.isRoot;
         const isFolder = folder instanceof TFolder;
 
         if (!isRootFile && !isFolder) return;
