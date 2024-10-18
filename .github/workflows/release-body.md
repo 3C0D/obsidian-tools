@@ -1,1 +1,1 @@
-littles changes (Root Folder Context Menu)
+fix isRoor
