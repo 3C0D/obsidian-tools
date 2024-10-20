@@ -10,9 +10,12 @@
 ## Import to folder:
 - Move/Copy File(s)/Dir(s) To Vault or folder (folder context menu) with options to replace or increment existing file(s)/dir(s)
 - You can find the menu on folders 
-- On files in the root folder of the vault too. I'm doing this because the root folder is not in the tree explorer anymore 🥹. Or run the command Move/Copy File(s)/Dir(s) To Vault in the palette. You can use the plugin Root Folder Context Menu to have the file context menu on the vault switcher.  
+- On files in the root folder of the vault too.. Or run the command Move/Copy File(s)/Dir(s) To Vault in the palette. You can use the added vault switcher context menu too.
 
-Additional features:
+## Root context menu on vault switcher:
+- Inspired on Root Folder Context Menu plugin, you can have the file context menu of the vault root folder on the vault switcher.
+- 
+## Additional features
 - Added search from directory improved (by Liam)
 - Each part of the plugin can be disabled in settings.
 

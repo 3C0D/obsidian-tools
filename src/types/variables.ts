@@ -1,14 +1,17 @@
-import { addMoveToVault } from "src/move to vault/move-to-vault";
-import { createMoveFilesMenuCallback, registerOutOfVault } from "../move out from vault/move-out-menus";
-import { SfdToEditorMenuCb, SfdToFileMenuCb, registerSFD } from "../search from directory/search-from-directory";
-import { ToggleElement, ToolsSettings } from "./global";
 import { App } from "obsidian";
-import Tools from "src/main";
+import type Tools from "../main.ts";
+import { registerOutOfVault, createMoveFilesMenuCallback } from "../move out from vault/move-out-menus.ts";
+import { addMoveToVault } from "../move to vault/move-to-vault.ts";
+import { registerSFD, SfdToFileMenuCb, SfdToEditorMenuCb } from "../search from directory/search-from-directory.ts";
+import type { ToggleElement, ToolsSettings } from "obsidian-typings";
+import { registerVaultContextMenu, uninstaller } from "../vaultContextMenu.ts";
+
 
 export const DEFAULT_SETTINGS: Readonly<ToolsSettings> = {
     "move-out-from-vault": true,
     "move-to-vault": true,
     "search-from-directory": true,
+    "vault-context-menu": true,
     vaultDirs: {},
     vaultFiles: {}
 };
@@ -52,5 +55,15 @@ export const settingsList: ToggleElement[] = [
             }
         },
         name: "move out from vault (when turned off a reload is done)"
+    }, {
+        setting: "vault-context-menu",
+        callback: async function (app: App, plugin: Tools, value: boolean) {
+            if (value) {
+                registerVaultContextMenu.call(plugin)
+            } else {
+                uninstaller()
+            }
+        },
+        name: "vault context menu"
     }
 ]

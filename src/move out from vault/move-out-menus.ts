@@ -1,5 +1,5 @@
 import { App, Menu, MenuItem, TFile, TFolder } from "obsidian";
-import { moveOutOfVault } from "./copy-move-out-of-vault";
+import { moveOutOfVault } from "./copy-move-out-of-vault.ts";
 
 export function registerOutOfVault(app: App): void {
     this.registerEvent(
@@ -13,6 +13,8 @@ export function registerOutOfVault(app: App): void {
 export function createMoveFilesMenuCallback(app: App) {
     return (menu: Menu, files: TFile | TFolder | (TFile | TFolder)[]) => {
         const fileArray = Array.isArray(files) ? files : [files];
+
+        if (fileArray.length === 1 && fileArray[0].path === "/") return;//vauult switcher contextmenu
 
         menu.addSeparator();
 

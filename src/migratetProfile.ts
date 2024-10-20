@@ -1,9 +1,10 @@
 import * as path from "path";
 import * as fs from "fs-extra";
-import { picker } from "./utils";
 import { App, Notice } from "obsidian";
-import Tools from "./main";
-import { openMigrateModal } from "./migrateProfileModal";
+import type Tools from "./main.ts";
+import { openMigrateModal } from "./migrateProfileModal.ts";
+import { picker } from "./utils.ts";
+
 
 export async function migrateProfile(plugin: Tools, app: App, isImport = true, customPath?: string): Promise<void> {
     try {

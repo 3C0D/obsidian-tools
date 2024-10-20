@@ -1,9 +1,10 @@
 import * as path from "path";
 import * as fs from "fs-extra";
-import { picker } from "src/utils";
 import { App, Menu, MenuItem, Notice, TFile, TFolder } from "obsidian";
-import { OutFromVaultConfirmModal } from "src/move out from vault/out-of-vault-confirm_modal";
-import { getIncrementedFilePath } from "src/move out from vault/copy-move-out-of-vault";
+import { getIncrementedFilePath } from "../move out from vault/copy-move-out-of-vault.ts";
+import { OutFromVaultConfirmModal } from "../move out from vault/out-of-vault-confirm_modal.ts";
+import { picker } from "../utils.ts";
+
 
 export function addMoveToVault(app: App) {
     this.addCommand({

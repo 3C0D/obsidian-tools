@@ -1,8 +1,8 @@
 import * as path from "path";
 import * as fs from "fs-extra";
 import { App, Modal, Setting } from "obsidian";
-import Tools from "./main";
-import { ConfirmCallback } from "./types/global";
+import type Tools from "./main.ts";
+import type { ConfirmCallback } from "./types/global.js";
 
 export async function openMigrateModal(plugin: Tools, app: App, dirPath: string, message: string, isImport: boolean): Promise<boolean> {
     return new Promise((resolve) => {

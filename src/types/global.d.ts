@@ -1,21 +1,24 @@
 import { App } from "obsidian";
-import Tools from "src/main";
+import type Tools from "../main.ts";
 
-interface toToggle {
-    "move-out-from-vault": boolean;
-    "move-to-vault": boolean;
-    "search-from-directory": boolean;
+declare module "obsidian-typings" {
+     interface toToggle {
+        "move-out-from-vault": boolean;
+        "move-to-vault": boolean;
+        "search-from-directory": boolean;
+        "vault-context-menu": boolean;
+    }
+
+     interface ToolsSettings extends toToggle {
+        vaultDirs: Record<string, boolean>,
+        vaultFiles: Record<string, boolean>
+    }
+
+      interface ToggleElement {
+        setting: string;
+        callback: (app: App, plugin: Tools, value: boolean) => Promise<void>;
+        name: string;
+    }
 }
 
-interface ToolsSettings extends toToggle {
-    vaultDirs: Record<string, boolean>,
-    vaultFiles: Record<string, boolean>
-}
-
-export interface ToggleElement {
-    setting: string;
-    callback: (app: App, plugin: Tools, value: boolean) => Promise<void>;
-    name: string;
-}
-
-export type ConfirmCallback = (confirmed: boolean) => void;
+ export type ConfirmCallback = (confirmed: boolean) => void;

@@ -1,8 +1,8 @@
 import { App, Notice, TFile, TFolder } from "obsidian";
-import { OutFromVaultConfirmModal } from "./out-of-vault-confirm_modal";
+import { OutFromVaultConfirmModal } from "./out-of-vault-confirm_modal.ts";
 import * as fs from "fs-extra";
 import * as path from "path";
-import { openDirectoryInFileManager, picker } from "src/utils";
+import { picker, openDirectoryInFileManager } from "../utils.ts";
 
 // Constants
 const MOVE_MESSAGE = "Move out of Vault: select directory";

@@ -2,8 +2,8 @@ import * as path from "path";
 import * as os from "os";
 import { App, Notice, Platform } from "obsidian";
 import { readFileSync } from "fs"
-import { VaultChooser } from "./vaultsModal";
-import { migrateProfile } from "./migratetProfile";
+import { VaultChooser } from "./vaultsModal.ts";
+import { migrateProfile } from "./migratetProfile.ts";
 
 declare global {
     interface Window {

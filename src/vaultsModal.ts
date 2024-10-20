@@ -1,5 +1,5 @@
 import { Modal, App, Setting } from "obsidian";
-import { getVaultPaths } from "./utils";
+import { getVaultPaths } from "./utils.ts";
 import * as path from "path";
 
 export class VaultChooser extends Modal {
@@ -24,7 +24,7 @@ export class VaultChooser extends Modal {
                         this.onSubmit("");
                     }));
 
-        getVaultPaths(this.app).forEach((_path) => {
+        getVaultPaths(this.app).forEach((_path: string) => {
             this.createVaultButtons(contentEl, _path)
         })
     }

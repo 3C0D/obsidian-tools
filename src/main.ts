@@ -1,13 +1,13 @@
-// todo: copy vault profile. insert in UI
-
 import { Plugin } from "obsidian";
-import { ToolsSettingTab } from "./settings";
-import { registerSFD } from "./search from directory/search-from-directory";
-import { registerOutOfVault } from "./move out from vault/move-out-menus";
-import { DEFAULT_SETTINGS } from "./types/variables";
-import { ToolsSettings } from "./types/global";
-import { addMoveToVault } from "./move to vault/move-to-vault";
-import { showVaultChooserModal } from "./utils";
+import { registerOutOfVault } from "./move out from vault/move-out-menus.ts";
+import { addMoveToVault } from "./move to vault/move-to-vault.ts";
+import { registerSFD } from "./search from directory/search-from-directory.ts";
+import { ToolsSettingTab } from "./settings.ts";
+import { DEFAULT_SETTINGS } from "./types/variables.ts";
+import { showVaultChooserModal } from "./utils.ts";
+import type { ToolsSettings } from "obsidian-typings";
+import { registerVaultContextMenu } from "./vaultContextMenu.ts";
+
 
 export default class Tools extends Plugin {
 	settings: ToolsSettings;
@@ -39,6 +39,9 @@ export default class Tools extends Plugin {
 
 		if (this.settings['search-from-directory']) {
 			registerSFD.call(this, this.app);
+		}
+		if(this.settings['vault-context-menu']) {
+			this.app.workspace.onLayoutReady(registerVaultContextMenu.bind(this));
 		}
 	}
 
