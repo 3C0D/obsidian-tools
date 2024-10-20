@@ -1,1 +1,1 @@
-vault switcher context menu added
+fix error vaultswitcher  contextmenu closed sidebar
