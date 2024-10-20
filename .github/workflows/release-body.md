@@ -1,1 +1,1 @@
-fix error vaultswitcher  contextmenu closed sidebar
+useless condition deleted
