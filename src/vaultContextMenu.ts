@@ -17,7 +17,7 @@ export function registerVaultContextMenu() {
     this.register(uninstaller);
 
     const vaultSwitcherEl = document.querySelector<HTMLElement>('.workspace-drawer-vault-switcher');
-    if (vaultSwitcherEl) {
+    if (vaultSwitcherEl && fileExplorerView.files && !fileExplorerView.files.has(vaultSwitcherEl)) {
         fileExplorerView.files.set(vaultSwitcherEl, this.app.vault.getRoot());
         this.registerDomEvent(vaultSwitcherEl, 'contextmenu', async (ev: MouseEvent): Promise<void> => {
             fileExplorerView.openFileContextMenu(ev, vaultSwitcherEl.childNodes[0] as HTMLElement);
