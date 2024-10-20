@@ -10,7 +10,8 @@
 ## Import to folder:
 - Move/Copy File(s)/Dir(s) To Vault or folder (folder context menu) with options to replace or increment existing file(s)/dir(s)
 - You can find the menu on folders 
-- On files in the root folder of the vault too.. Or run the command Move/Copy File(s)/Dir(s) To Vault in the palette. You can use the added vault switcher context menu too.
+- You can use the added vault switcher context menu to import to root.
+- Or the command Move/Copy File(s)/Dir(s) To Vault in palette. 
 
 ## Root context menu on vault switcher:
 - Inspired on Root Folder Context Menu plugin, you can have the file context menu of the vault root folder on the vault switcher.
@@ -23,33 +24,6 @@
 [^2]: You can select several files holding alt.
 [^3]: The destination folder is opened at the end to check results...
 
-
-# obsidian-tools
-
-New: 
-- import or export vault profile.
-
-For repeat last command, it's there now https://github.com/1C0D/obsidian-repeat-last-commands (waiting to be released)
-
-- Import/export  Vault Profile  
-  yo can check what you want to import/export. mainly: themes, snippets, plugins[^1], prefs, hotkeys,...
-  if existing json files and folder are updated. kind of sync...   
-
-
----
-- Move/Copy File(s)/Dir(s) OUT of Vault[^2][^3]
-  with options to replace or increment existing file(s)/dir(s)   
-  and to copy resolved links too (md, jpg...) 
---- 
-- Import to folder: Move/Copy File(s)/Dir(s) To Vault or folder (folder context menu). You can find the menu on folders. and on files in the root folder of the vault too. I'm doing this because the root folder is not in the tree anymore 🥹. Or run the command  Move/Copy File(s)/Dir(s) To Vault in the palette.
----
-- added search from directory improved (by Liam)
----
-- each part of the plugin can be disabled in settings.
-
-[^1]: copying plugins won't copy node-modules folders, so cloned repo will be copied super fast. debugs are printed
-[^2]: you can select several files holding alt  
-[^3]: the destination folder is opened at the end to check results...
 
 ## Development (Add this to your README)
 

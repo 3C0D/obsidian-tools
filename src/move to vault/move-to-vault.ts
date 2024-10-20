@@ -1,6 +1,6 @@
 import * as path from "path";
 import * as fs from "fs-extra";
-import { App, Menu, MenuItem, Notice, TFile, TFolder } from "obsidian";
+import { App, Menu, MenuItem, Notice, TFolder } from "obsidian";
 import { getIncrementedFilePath } from "../move out from vault/copy-move-out-of-vault.ts";
 import { OutFromVaultConfirmModal } from "../move out from vault/out-of-vault-confirm_modal.ts";
 import { picker } from "../utils.ts";
@@ -98,13 +98,10 @@ async function processFiles(selectedPaths: string[], destinationPath: string, mo
 
 function createMTVFolderMenu(app: App) {
     return (menu: Menu, folder: TFolder) => {
-        const isRootFile = folder instanceof TFile && folder.isRoot;
         const isFolder = folder instanceof TFolder;
-
-        if (!isRootFile && !isFolder) return;
+        if (!isFolder) return;
 
         menu.addSeparator();
-
         menu.addItem(async (item) => {
             item.setTitle("Import to folder").setIcon("folder-input");
             const submenu = item.setSubmenu();
