@@ -14,7 +14,7 @@
 
 ## Root context menu on vault switcher:
 - Inspired on Root Folder Context Menu plugin, you can have the file context menu of the vault root folder on the vault switcher.
-- 
+
 ## Additional features
 - Added search from directory improved (by Liam)
 - Each part of the plugin can be disabled in settings.
