@@ -30,7 +30,7 @@ export async function moveOutOfVault(app: App, files: (TFile | TFolder)[], job: 
 	}
 
 	if (runModal || attached.size > 0) {
-		new OutFromVaultConfirmModal(app, runModal, Array.from(attached), async (result) => {
+		new OutFromVaultConfirmModal(app, true, Array.from(attached), async (result) => {
 			if (!result) {
 				return;
 			}

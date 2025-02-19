@@ -11,7 +11,7 @@
 - Move/Copy File(s)/Dir(s) To Vault or folder (folder context menu) with options to replace or increment existing file(s)/dir(s)
 - You can find the menu on folders 
 - You can use the added vault switcher context menu to import to root.
-- Or the command Move/Copy File(s)/Dir(s) To Vault in palette. 
+- Or the command Move/Copy File(s)/Dir(s) To Vault in palette.
 
 ## Root context menu on vault switcher:
 - Inspired on Root Folder Context Menu plugin, you can have the file context menu of the vault root folder on the vault switcher.
