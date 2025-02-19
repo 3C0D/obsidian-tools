@@ -1,12 +1,12 @@
 import { Plugin } from "obsidian";
 import { registerOutOfVault } from "./move out from vault/move-out-menus.ts";
+import { addImportToVault } from "./import to vault/import-to-vault.ts";
 import { registerSFD } from "./search from directory/search-from-directory.ts";
 import { ToolsSettingTab } from "./settings.ts";
 import { DEFAULT_SETTINGS } from "./types/variables.ts";
 import { showVaultChooserModal } from "./utils.ts";
 import type { ToolsSettings } from "obsidian-typings";
 import { registerVaultContextMenu } from "./vaultContextMenu.ts";
-import { addImportToVault } from "./import to vault/import-to-vault.ts";
 
 
 export default class Tools extends Plugin {
@@ -33,8 +33,8 @@ export default class Tools extends Plugin {
 			registerOutOfVault.call(this, this.app);
 		}
 
-		if (this.settings['import-to-vault']) {
-			addImportToVault.call(this, this.app);
+		if (this.settings['move-to-vault']) {
+			addMoveToVault.call(this, this.app);
 		}
 
 		if (this.settings['search-from-directory']) {

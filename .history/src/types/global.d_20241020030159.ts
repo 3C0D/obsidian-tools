@@ -4,7 +4,7 @@ import type Tools from "../main.ts";
 declare module "obsidian-typings" {
      interface toToggle {
         "move-out-from-vault": boolean;
-        "import-to-vault": boolean;
+        "move-to-vault": boolean;
         "search-from-directory": boolean;
         "vault-context-menu": boolean;
     }

@@ -33,7 +33,7 @@ export default class Tools extends Plugin {
 			registerOutOfVault.call(this, this.app);
 		}
 
-		if (this.settings['import-to-vault']) {
+		if (this.settings['move-to-vault']) {
 			addImportToVault.call(this, this.app);
 		}
 

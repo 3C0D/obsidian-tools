@@ -30,7 +30,7 @@ export const settingsList: ToggleElement[] = [
         },
         name: "search from directory(when turned off a reload is done)"
     }, {
-        setting: "import-to-vault",
+        setting: "move-to-vault",
         callback: async function (app: App, plugin: Tools, value: boolean) {
             if (value) {
                 addImportToVault.call(this, app)

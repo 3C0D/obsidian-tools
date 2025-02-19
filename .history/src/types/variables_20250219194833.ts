@@ -9,7 +9,7 @@ import { registerVaultContextMenu, uninstaller } from "../vaultContextMenu.ts";
 
 export const DEFAULT_SETTINGS: Readonly<ToolsSettings> = {
     "move-out-from-vault": true,
-    "import-to-vault": true,
+    "move-to-vault": true,
     "search-from-directory": true,
     "vault-context-menu": true,
     vaultDirs: {},
@@ -30,10 +30,10 @@ export const settingsList: ToggleElement[] = [
         },
         name: "search from directory(when turned off a reload is done)"
     }, {
-        setting: "import-to-vault",
+        setting: "move-to-vault",
         callback: async function (app: App, plugin: Tools, value: boolean) {
             if (value) {
-                addImportToVault.call(this, app)
+                addMoveToVault.call(this, app)
             } else {
                 const list = [
                     'obsidian-my-tools:move-files-to-vault', 'obsidian-my-tools:move-directory-to-vault', 'obsidian-my-tools:copy-files-to-vault', 'obsidian-my-tools:copy-directory-to-vault'
