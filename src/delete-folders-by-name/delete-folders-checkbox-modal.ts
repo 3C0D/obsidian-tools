@@ -83,21 +83,8 @@ export class DeleteFoldersCheckboxModal extends Modal {
                 });
         }
 
-        // Add buttons
+        // Add buttons (order inverted for better UX)
         new Setting(contentEl)
-            .addButton(btn => {
-                btn.setButtonText("Select All")
-                    .onClick(() => {
-                        // Use the stored toggle references to set all to true
-                        for (const folder of this.folders) {
-                            const toggle = this.toggles.get(folder.path);
-                            if (toggle) {
-                                toggle.setValue(true);
-                            }
-                            this.selectedFolders.set(folder.path, true);
-                        }
-                    });
-            })
             .addButton(btn => {
                 btn.setButtonText("Deselect All")
                     .onClick(() => {
@@ -108,6 +95,19 @@ export class DeleteFoldersCheckboxModal extends Modal {
                                 toggle.setValue(false);
                             }
                             this.selectedFolders.set(folder.path, false);
+                        }
+                    });
+            })
+            .addButton(btn => {
+                btn.setButtonText("Select All")
+                    .onClick(() => {
+                        // Use the stored toggle references to set all to true
+                        for (const folder of this.folders) {
+                            const toggle = this.toggles.get(folder.path);
+                            if (toggle) {
+                                toggle.setValue(true);
+                            }
+                            this.selectedFolders.set(folder.path, true);
                         }
                     });
             });

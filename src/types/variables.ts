@@ -4,6 +4,8 @@ import { registerOutOfVault, createMoveFilesMenuCallback } from "../move out fro
 import { addImportToVault } from "../import to vault/import-to-vault.ts";
 import type { ToggleElement, ToolsSettings } from "obsidian-typings";
 import { registerVaultContextMenu, uninstaller } from "../vaultContextMenu.ts";
+import { registerDeleteFoldersByName } from "../delete-folders-by-name/delete-folders-by-name.ts";
+import { registerSearchFolders } from "../search-folders/search-folders.ts";
 
 
 export const DEFAULT_SETTINGS: Readonly<ToolsSettings> = {
@@ -11,6 +13,8 @@ export const DEFAULT_SETTINGS: Readonly<ToolsSettings> = {
     "import-to-vault": true,
     "search-from-directory": false, // Now native in Obsidian
     "vault-context-menu": true,
+    "delete-folders-by-name": true,
+    "search-folders": true,
     vaultDirs: {},
     vaultFiles: {}
 };
@@ -53,5 +57,37 @@ export const settingsList: ToggleElement[] = [
             }
         },
         name: "vault context menu"
+    }, {
+        setting: "delete-folders-by-name",
+        callback: async function (app: App, plugin: Tools, value: boolean) {
+            if (value) {
+                // Add the command if it's enabled
+                plugin.addCommand({
+                    id: 'delete-folders-by-name',
+                    name: 'Delete folders by name',
+                    callback: () => registerDeleteFoldersByName(app),
+                });
+            } else {
+                // Remove the command if it's disabled
+                app.commands.removeCommand('obsidian-my-tools:delete-folders-by-name');
+            }
+        },
+        name: "delete folders by name"
+    }, {
+        setting: "search-folders",
+        callback: async function (app: App, plugin: Tools, value: boolean) {
+            if (value) {
+                // Add the command if it's enabled
+                plugin.addCommand({
+                    id: 'search-folders',
+                    name: 'Search folders',
+                    callback: () => registerSearchFolders(app),
+                });
+            } else {
+                // Remove the command if it's disabled
+                app.commands.removeCommand('obsidian-my-tools:search-folders');
+            }
+        },
+        name: "search folders"
     }
 ]

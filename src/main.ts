@@ -43,9 +43,28 @@ export default class Tools extends Plugin {
 		if (this.settings['vault-context-menu']) {
 			this.app.workspace.onLayoutReady(registerVaultContextMenu.bind(this));
 		}
+
+		// Register the delete folders by name command if enabled
+		if (this.settings['delete-folders-by-name']) {
+			this.addCommand({
+				id: 'delete-folders-by-name',
+				name: 'Delete folders by name',
+				callback: () => registerDeleteFoldersByName(this.app),
+			});
+		}
+
+		// Register the search folders command if enabled
+		if (this.settings['search-folders']) {
+			this.addCommand({
+				id: 'search-folders',
+				name: 'Search folders',
+				callback: () => registerSearchFolders(this.app),
+			});
+		}
 	}
 
 	private registerPluginCommands() {
+		// Always register these core commands
 		this.addCommand({
 			id: 'import-vault-profile',
 			name: 'Import vault profile',
@@ -58,16 +77,7 @@ export default class Tools extends Plugin {
 			callback: () => showVaultChooserModal.call(this, this.app, false),
 		});
 
-		this.addCommand({
-			id: 'delete-folders-by-name',
-			name: 'Delete folders by name',
-			callback: () => registerDeleteFoldersByName(this.app),
-		});
-
-		this.addCommand({
-			id: 'search-folders',
-			name: 'Search folders',
-			callback: () => registerSearchFolders(this.app),
-		});
+		// The other commands are registered conditionally in the settings callbacks
+		// to allow them to be dynamically added/removed when settings change
 	}
 }

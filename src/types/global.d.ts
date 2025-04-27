@@ -7,6 +7,8 @@ declare module "obsidian-typings" {
     "import-to-vault": boolean;
     "search-from-directory": boolean; // Kept for backward compatibility, now native in Obsidian
     "vault-context-menu": boolean;
+    "delete-folders-by-name": boolean;
+    "search-folders": boolean;
   }
 
   interface ToolsSettings extends toToggle {
