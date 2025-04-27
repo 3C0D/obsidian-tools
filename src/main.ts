@@ -7,6 +7,7 @@ import { showVaultChooserModal } from "./utils.ts";
 import type { ToolsSettings } from "obsidian-typings";
 import { registerVaultContextMenu } from "./vaultContextMenu.ts";
 import { addImportToVault } from "./import to vault/import-to-vault.ts";
+import { registerDeleteFoldersByName } from "./delete-folders-by-name/delete-folders-by-name.ts";
 
 
 export default class Tools extends Plugin {
@@ -56,6 +57,12 @@ export default class Tools extends Plugin {
 			id: 'export-vault-profile',
 			name: 'Export vault profile',
 			callback: () => showVaultChooserModal.call(this, this.app, false),
+		});
+
+		this.addCommand({
+			id: 'delete-folders-by-name',
+			name: 'Delete folders by name',
+			callback: () => registerDeleteFoldersByName(this.app),
 		});
 	}
 }
