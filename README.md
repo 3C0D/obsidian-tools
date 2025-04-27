@@ -23,6 +23,11 @@
 - Includes detailed confirmation dialog explaining exactly what will be deleted
 - All matching folders are moved to trash, regardless of their location in the vault
 
+## Search folders:
+- Find all folders with the same name across your vault
+- Shows folder content information (empty or number of files/subfolders)
+- Double-click on a folder to reveal it in the explorer
+
 ## Additional features
 - ~~Search from directory~~ (Now native in Obsidian)
 - Each part of the plugin can be disabled in settings.

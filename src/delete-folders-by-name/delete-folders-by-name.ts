@@ -1,5 +1,5 @@
 import { App, FuzzySuggestModal, Notice, TFolder } from "obsidian";
-import { GenericConfirmModal } from "../common/generic-confirm-modal.ts";
+import { DeleteFoldersCheckboxModal } from "./delete-folders-checkbox-modal.ts";
 
 /**
  * Suggester modal that displays all folders in the vault
@@ -37,24 +37,14 @@ export class FolderSuggestModal extends FuzzySuggestModal<string> {
         const folders = this.uniqueFolderNames.get(folderName) || [];
         if (folders.length === 0) return;
 
-        // Create paths list for confirmation message
-        const pathsList = folders.map(f => `• ${f.path}`).join('\n');
-
-        // Use the generic confirmation modal
-        new GenericConfirmModal(
+        // Use the checkbox confirmation modal
+        new DeleteFoldersCheckboxModal(
             this.app,
-            "Delete Confirmation",
-            [
-                `Are you sure you want to delete ALL folders named "${folderName}" across your entire vault?`,
-                `This will delete the following ${folders.length} folder${folders.length !== 1 ? 's' : ''}:`,
-                pathsList,
-                "⚠️ This action will move all matching folders to trash."
-            ],
-            "Confirm",
-            "Cancel",
-            async (confirmed) => {
-                if (confirmed) {
-                    await deleteFoldersByName(this.app, folderName);
+            folderName,
+            folders,
+            async (selectedFolders) => {
+                if (selectedFolders.length > 0) {
+                    await deleteSelectedFolders(this.app, selectedFolders);
                 }
             }
         ).open();
@@ -88,6 +78,57 @@ export function getAllFolders(app: App): TFolder[] {
 }
 
 /**
+ * Delete selected folders
+ */
+export async function deleteSelectedFolders(app: App, foldersToDelete: TFolder[]): Promise<void> {
+    if (foldersToDelete.length === 0) {
+        return;
+    }
+
+    // Sort folders by path length (shortest first) to delete parents before children
+    const sortedFolders = [...foldersToDelete].sort((a, b) => a.path.length - b.path.length);
+
+    // Keep track of deleted paths to avoid errors when trying to delete children of already deleted folders
+    const deletedPaths: string[] = [];
+    let deletedCount = 0;
+    let failedCount = 0;
+
+    for (const folder of sortedFolders) {
+        // Skip if this folder is a child of an already deleted folder
+        if (deletedPaths.some(path => folder.path.startsWith(path + "/"))) {
+            // This folder was already deleted as part of a parent folder
+            deletedCount++;
+            continue;
+        }
+
+        try {
+            await app.vault.trash(folder, true);
+            deletedCount++;
+            deletedPaths.push(folder.path);
+        } catch (error) {
+            // Check if the error is because the folder doesn't exist (already deleted)
+            const errorMessage = String(error);
+            if (errorMessage.includes("does not exist") || errorMessage.includes("no such file")) {
+                // Folder was already deleted, count it as success
+                deletedCount++;
+            } else {
+                console.error(`Error deleting folder ${folder.path}:`, error);
+                new Notice(`Failed to delete folder ${folder.path}`, 3000);
+                failedCount++;
+            }
+        }
+    }
+
+    if (deletedCount > 0) {
+        new Notice(`${deletedCount} folder(s) moved to trash.`, 4000);
+    }
+
+    if (failedCount > 0) {
+        new Notice(`Failed to delete ${failedCount} folder(s). Check console for details.`, 4000);
+    }
+}
+
+/**
  * Delete all folders with the given name
  */
 export async function deleteFoldersByName(app: App, folderName: string): Promise<void> {
@@ -99,27 +140,7 @@ export async function deleteFoldersByName(app: App, folderName: string): Promise
         return;
     }
 
-    let deletedCount = 0;
-    let failedCount = 0;
-
-    for (const folder of foldersToDelete) {
-        try {
-            await app.vault.trash(folder, true);
-            deletedCount++;
-        } catch (error) {
-            console.error(`Error deleting folder ${folder.path}:`, error);
-            new Notice(`Failed to delete folder ${folder.path}`, 3000);
-            failedCount++;
-        }
-    }
-
-    if (deletedCount > 0) {
-        new Notice(`${deletedCount} folder(s) named "${folderName}" moved to trash.`, 4000);
-    }
-
-    if (failedCount > 0) {
-        new Notice(`Failed to delete ${failedCount} folder(s). Check console for details.`, 4000);
-    }
+    await deleteSelectedFolders(app, foldersToDelete);
 }
 
 /**

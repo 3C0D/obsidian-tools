@@ -7,6 +7,7 @@ import type { ToolsSettings } from "obsidian-typings";
 import { registerVaultContextMenu } from "./vaultContextMenu.ts";
 import { addImportToVault } from "./import to vault/import-to-vault.ts";
 import { registerDeleteFoldersByName } from "./delete-folders-by-name/delete-folders-by-name.ts";
+import { registerSearchFolders } from "./search-folders/search-folders.ts";
 
 
 export default class Tools extends Plugin {
@@ -61,6 +62,12 @@ export default class Tools extends Plugin {
 			id: 'delete-folders-by-name',
 			name: 'Delete folders by name',
 			callback: () => registerDeleteFoldersByName(this.app),
+		});
+
+		this.addCommand({
+			id: 'search-folders',
+			name: 'Search folders',
+			callback: () => registerSearchFolders(this.app),
 		});
 	}
 }
