@@ -1,1 +1,1 @@
-fix previous changes and search folders and reveal. A very missing fonction !
+fix on settings to toggle new options
