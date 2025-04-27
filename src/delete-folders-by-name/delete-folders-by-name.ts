@@ -1,33 +1,63 @@
 import { App, FuzzySuggestModal, Notice, TFolder } from "obsidian";
-import { DeleteFolderConfirmModal } from "./delete-folder-confirm-modal.ts";
+import { GenericConfirmModal } from "../common/generic-confirm-modal.ts";
 
 /**
  * Suggester modal that displays all folders in the vault
  */
-export class FolderSuggestModal extends FuzzySuggestModal<TFolder> {
-    folders: TFolder[];
+export class FolderSuggestModal extends FuzzySuggestModal<string> {
+    // Store unique folder names to optimize the suggester
+    private uniqueFolderNames: Map<string, TFolder[]>;
 
     constructor(app: App, folders: TFolder[]) {
         super(app);
-        this.folders = folders;
-        this.setPlaceholder("Select any folder with the name you want to delete");
-    }
+        this.setPlaceholder("Select a folder name to delete");
 
-    getItems(): TFolder[] {
-        return this.folders;
-    }
-
-    getItemText(folder: TFolder): string {
-        // Show the full path for context, but highlight that we're looking at folder names
-        return `${folder.path} (name: "${folder.name}")`;
-    }
-
-    onChooseItem(folder: TFolder, _evt: MouseEvent | KeyboardEvent): void {
-        new DeleteFolderConfirmModal(this.app, folder.path, async (confirmed) => {
-            if (confirmed) {
-                await deleteFoldersByName(this.app, folder.name);
+        // Group folders by name for more efficient processing
+        this.uniqueFolderNames = new Map();
+        for (const folder of folders) {
+            if (!this.uniqueFolderNames.has(folder.name)) {
+                this.uniqueFolderNames.set(folder.name, []);
             }
-        }).open();
+            this.uniqueFolderNames.get(folder.name)?.push(folder);
+        }
+    }
+
+    getItems(): string[] {
+        // Return unique folder names instead of folder objects
+        return Array.from(this.uniqueFolderNames.keys());
+    }
+
+    getItemText(folderName: string): string {
+        // Show the folder name and count of occurrences
+        const count = this.uniqueFolderNames.get(folderName)?.length || 0;
+        return `${folderName} (${count} folder${count !== 1 ? 's' : ''})`;
+    }
+
+    onChooseItem(folderName: string, _evt: MouseEvent | KeyboardEvent): void {
+        const folders = this.uniqueFolderNames.get(folderName) || [];
+        if (folders.length === 0) return;
+
+        // Create paths list for confirmation message
+        const pathsList = folders.map(f => `• ${f.path}`).join('\n');
+
+        // Use the generic confirmation modal
+        new GenericConfirmModal(
+            this.app,
+            "Delete Confirmation",
+            [
+                `Are you sure you want to delete ALL folders named "${folderName}" across your entire vault?`,
+                `This will delete the following ${folders.length} folder${folders.length !== 1 ? 's' : ''}:`,
+                pathsList,
+                "⚠️ This action will move all matching folders to trash."
+            ],
+            "Confirm",
+            "Cancel",
+            async (confirmed) => {
+                if (confirmed) {
+                    await deleteFoldersByName(this.app, folderName);
+                }
+            }
+        ).open();
     }
 }
 
@@ -70,17 +100,26 @@ export async function deleteFoldersByName(app: App, folderName: string): Promise
     }
 
     let deletedCount = 0;
+    let failedCount = 0;
+
     for (const folder of foldersToDelete) {
         try {
             await app.vault.trash(folder, true);
             deletedCount++;
         } catch (error) {
             console.error(`Error deleting folder ${folder.path}:`, error);
-            new Notice(`Failed to delete folder ${folder.path}`);
+            new Notice(`Failed to delete folder ${folder.path}`, 3000);
+            failedCount++;
         }
     }
 
-    new Notice(`${deletedCount} folder(s) named "${folderName}" deleted.`);
+    if (deletedCount > 0) {
+        new Notice(`${deletedCount} folder(s) named "${folderName}" moved to trash.`, 4000);
+    }
+
+    if (failedCount > 0) {
+        new Notice(`Failed to delete ${failedCount} folder(s). Check console for details.`, 4000);
+    }
 }
 
 /**

@@ -24,7 +24,7 @@
 - All matching folders are moved to trash, regardless of their location in the vault
 
 ## Additional features
-- Added search from directory improved (by Liam)
+- ~~Search from directory~~ (Now native in Obsidian)
 - Each part of the plugin can be disabled in settings.
 
 [^1]: For developpers, copying plugins won't copy node-modules folders, so cloned repo will be copied super fast.

@@ -1,6 +1,5 @@
 import { Plugin } from "obsidian";
 import { registerOutOfVault } from "./move out from vault/move-out-menus.ts";
-import { registerSFD } from "./search from directory/search-from-directory.ts";
 import { ToolsSettingTab } from "./settings.ts";
 import { DEFAULT_SETTINGS } from "./types/variables.ts";
 import { showVaultChooserModal } from "./utils.ts";
@@ -38,9 +37,8 @@ export default class Tools extends Plugin {
 			addImportToVault.call(this, this.app);
 		}
 
-		if (this.settings['search-from-directory']) {
-			registerSFD.call(this, this.app);
-		}
+		// Search from directory is now native in Obsidian
+
 		if (this.settings['vault-context-menu']) {
 			this.app.workspace.onLayoutReady(registerVaultContextMenu.bind(this));
 		}

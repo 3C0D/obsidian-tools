@@ -2,7 +2,6 @@ import { App } from "obsidian";
 import type Tools from "../main.ts";
 import { registerOutOfVault, createMoveFilesMenuCallback } from "../move out from vault/move-out-menus.ts";
 import { addImportToVault } from "../import to vault/import-to-vault.ts";
-import { registerSFD, SfdToFileMenuCb, SfdToEditorMenuCb } from "../search from directory/search-from-directory.ts";
 import type { ToggleElement, ToolsSettings } from "obsidian-typings";
 import { registerVaultContextMenu, uninstaller } from "../vaultContextMenu.ts";
 
@@ -10,26 +9,15 @@ import { registerVaultContextMenu, uninstaller } from "../vaultContextMenu.ts";
 export const DEFAULT_SETTINGS: Readonly<ToolsSettings> = {
     "move-out-from-vault": true,
     "import-to-vault": true,
-    "search-from-directory": true,
+    "search-from-directory": false, // Now native in Obsidian
     "vault-context-menu": true,
     vaultDirs: {},
     vaultFiles: {}
 };
 
 export const settingsList: ToggleElement[] = [
+    // Search from directory is now native in Obsidian
     {
-        setting: "search-from-directory",
-        callback: async function (app: App, plugin: Tools, value: boolean) {
-            if (value) {
-                registerSFD.bind(this)();
-            } else {
-                app.workspace.off("file-menu", SfdToFileMenuCb.bind(this)());
-                app.workspace.off("editor-menu", SfdToEditorMenuCb.bind(this)());
-                app.commands.executeCommandById('app:reload');
-            }
-        },
-        name: "search from directory(when turned off a reload is done)"
-    }, {
         setting: "import-to-vault",
         callback: async function (app: App, plugin: Tools, value: boolean) {
             if (value) {
