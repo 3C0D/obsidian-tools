@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-my-tools",
-	"version": "1.4.0",
+	"version": "1.4.1",
 	"description": "import, export, move...",
 	"main": "main.js",
 	"type": "module",
