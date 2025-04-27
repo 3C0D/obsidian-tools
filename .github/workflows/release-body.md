@@ -1,1 +1,1 @@
-removed search from directory. it's now native. improved delete folder by name
+fix previous changes and search folders and reveal. A very missing fonction !
