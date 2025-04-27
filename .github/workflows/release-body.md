@@ -1,1 +1,1 @@
-move to changed in import to
+delete folders by name in the vault after confirmation
