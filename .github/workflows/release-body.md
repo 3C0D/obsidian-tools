@@ -1,1 +1,1 @@
-delete folders by name in the vault after confirmation
+removed search from directory. it's now native. improved delete folder by name
