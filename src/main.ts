@@ -1,13 +1,14 @@
 import { Plugin } from "obsidian";
-import { registerOutOfVault } from "./move out from vault/move-out-menus.ts";
 import { ToolsSettingTab } from "./settings.ts";
 import { DEFAULT_SETTINGS } from "./types/variables.ts";
 import { showVaultChooserModal } from "./utils.ts";
 import type { ToolsSettings } from "obsidian-typings";
 import { registerVaultContextMenu } from "./vaultContextMenu.ts";
-import { addImportToVault } from "./import to vault/import-to-vault.ts";
 import { registerDeleteFoldersByName } from "./delete-folders-by-name/delete-folders-by-name.ts";
 import { registerSearchFolders } from "./search-folders/search-folders.ts";
+import { registerOutOfVault } from "./move-ou-from-vault/move-out-menus.ts";
+import { addImportToVault } from "./import-to-vault/import-to-vault.ts";
+import { addDeleteEmptyFolders } from "./delete-empty-folders/delete-empty-folders.ts";
 
 
 export default class Tools extends Plugin {
@@ -60,6 +61,11 @@ export default class Tools extends Plugin {
 				name: 'Search folders',
 				callback: () => registerSearchFolders(this.app),
 			});
+		}
+
+		// Register the delete empty folders command if enabled
+		if (this.settings['delete-empty-folders']) {
+			addDeleteEmptyFolders.call(this, this.app);
 		}
 	}
 

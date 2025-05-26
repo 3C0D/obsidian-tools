@@ -1,11 +1,12 @@
 import { App } from "obsidian";
 import type Tools from "../main.ts";
-import { registerOutOfVault, createMoveFilesMenuCallback } from "../move out from vault/move-out-menus.ts";
-import { addImportToVault } from "../import to vault/import-to-vault.ts";
 import type { ToggleElement, ToolsSettings } from "obsidian-typings";
 import { registerVaultContextMenu, uninstaller } from "../vaultContextMenu.ts";
 import { registerDeleteFoldersByName } from "../delete-folders-by-name/delete-folders-by-name.ts";
 import { registerSearchFolders } from "../search-folders/search-folders.ts";
+import { addImportToVault } from "../import-to-vault/import-to-vault.ts";
+import { registerOutOfVault, createMoveFilesMenuCallback } from "../move-ou-from-vault/move-out-menus.ts";
+import { addDeleteEmptyFolders } from "../delete-empty-folders/delete-empty-folders.ts";
 
 
 export const DEFAULT_SETTINGS: Readonly<ToolsSettings> = {
@@ -15,6 +16,7 @@ export const DEFAULT_SETTINGS: Readonly<ToolsSettings> = {
     "vault-context-menu": true,
     "delete-folders-by-name": true,
     "search-folders": true,
+    "delete-empty-folders": true,
     vaultDirs: {},
     vaultFiles: {}
 };
@@ -89,5 +91,16 @@ export const settingsList: ToggleElement[] = [
             }
         },
         name: "search folders"
+    }, {
+        setting: "delete-empty-folders",
+        callback: async function (app: App, plugin: Tools, value: boolean) {
+            if (value) {
+                addDeleteEmptyFolders.call(plugin, app);
+            } else {
+                // Remove the command if it's disabled
+                app.commands.removeCommand('obsidian-my-tools:delete-empty-folders');
+            }
+        },
+        name: "delete empty folders"
     }
 ]

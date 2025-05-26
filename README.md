@@ -28,6 +28,13 @@
 - Shows folder content information (empty or number of files/subfolders)
 - Double-click on a folder to reveal it in the explorer
 
+## Delete empty folders:
+- Recursively find and delete all empty folders in your vault or within a specific folder
+- Use the command palette to clean empty folders from the entire vault
+- Use the folder context menu to clean empty folders within a specific directory
+- Shows a confirmation dialog with checkboxes for each empty folder found
+- All selected empty folders are moved to trash
+
 ## Additional features
 - ~~Search from directory~~ (Now native in Obsidian)
 - Each part of the plugin can be disabled in settings.
