@@ -23,7 +23,7 @@ jobs:
         id: build
         run: |
           npm install
-          npx tsc -noEmit -skipLibCheck && npm run build-no-check
+          npm run build
 
       # Create the release on GitHub
       - name: Create Release

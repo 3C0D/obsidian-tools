@@ -13,7 +13,8 @@ declare global {
 }
 
 export async function picker(message: string, properties: string[]) {
-    const dirPath = window.electron.remote.dialog.showOpenDialogSync({
+    const electronRemote = (window as any).electron.remote;
+    const dirPath = electronRemote.dialog.showOpenDialogSync({
         title: message,
         properties
     });
@@ -23,9 +24,9 @@ export async function picker(message: string, properties: string[]) {
 }
 
 export async function openDirectoryInFileManager(dirPath: string) {
-    const shell = window.electron.remote.shell;
+    const electronShell = (window as any).electron.remote.shell;
     try {
-        await shell.openPath(dirPath);
+        await electronShell.openPath(dirPath);
     } catch (err) {
         console.error(err);
     }
