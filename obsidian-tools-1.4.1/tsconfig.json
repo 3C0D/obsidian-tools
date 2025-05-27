@@ -24,7 +24,6 @@
     "verbatimModuleSyntax": true,
     "forceConsistentCasingInFileNames": true,
     "strictNullChecks": true,
-    "resolveJsonModule": true,
     "lib": [
       "DOM",
       "ES2021"

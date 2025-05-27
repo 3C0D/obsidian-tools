@@ -1,0 +1,1 @@
+fix on settings to toggle new options

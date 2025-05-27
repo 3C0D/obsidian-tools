@@ -23,8 +23,9 @@ export async function picker(message: string, properties: string[]) {
 }
 
 export async function openDirectoryInFileManager(dirPath: string) {
+    const shell = window.electron.remote.shell;
     try {
-        await window.electron.remote.shell.openPath(dirPath);
+        await shell.openPath(dirPath);
     } catch (err) {
         console.error(err);
     }
