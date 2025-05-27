@@ -5,16 +5,27 @@ import { readFileSync } from "fs"
 import { VaultChooser } from "./vaultsModal.ts";
 import { migrateProfile } from "./migratetProfile.ts";
 
+// Obsidian uses the old Electron remote API
+interface ObsidianElectron {
+    remote: {
+        dialog: {
+            showOpenDialogSync: (options: any) => string[] | undefined;
+        };
+        shell: {
+            openPath: (path: string) => Promise<string>;
+        };
+    };
+}
+
 declare global {
     interface Window {
-        electron: any;
+        electron: ObsidianElectron;
         require: NodeRequire;
     }
 }
 
 export async function picker(message: string, properties: string[]) {
-    const electronRemote = (window as any).electron.remote;
-    const dirPath = electronRemote.dialog.showOpenDialogSync({
+    const dirPath = window.electron.remote.dialog.showOpenDialogSync({
         title: message,
         properties
     });
@@ -24,9 +35,8 @@ export async function picker(message: string, properties: string[]) {
 }
 
 export async function openDirectoryInFileManager(dirPath: string) {
-    const electronShell = (window as any).electron.remote.shell;
     try {
-        await electronShell.openPath(dirPath);
+        await window.electron.remote.shell.openPath(dirPath);
     } catch (err) {
         console.error(err);
     }
