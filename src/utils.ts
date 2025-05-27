@@ -5,20 +5,9 @@ import { readFileSync } from "fs"
 import { VaultChooser } from "./vaultsModal.ts";
 import { migrateProfile } from "./migratetProfile.ts";
 
-interface ElectronAPI {
-    remote: {
-        dialog: {
-            showOpenDialogSync: (options: any) => string[] | undefined;
-        };
-        shell: {
-            openPath: (path: string) => Promise<string>;
-        };
-    };
-}
-
 declare global {
     interface Window {
-        electron: ElectronAPI;
+        electron: any;
         require: NodeRequire;
     }
 }
