@@ -7,26 +7,12 @@ import { migrateProfile } from "./migratetProfile.ts";
 
 declare global {
     interface Window {
-        electron: {
-            remote?: {
-                dialog: {
-                    showOpenDialogSync: (options: any) => string[] | undefined;
-                };
-                shell: {
-                    openPath: (path: string) => Promise<string>;
-                };
-            };
-        };
+        electron: any;
         require: NodeRequire;
     }
 }
 
 export async function picker(message: string, properties: string[]) {
-    if (!window.electron?.remote?.dialog) {
-        console.error("Electron remote dialog not available");
-        return undefined;
-    }
-
     const dirPath = window.electron.remote.dialog.showOpenDialogSync({
         title: message,
         properties
@@ -37,11 +23,6 @@ export async function picker(message: string, properties: string[]) {
 }
 
 export async function openDirectoryInFileManager(dirPath: string) {
-    if (!window.electron?.remote?.shell) {
-        console.error("Electron remote shell not available");
-        return;
-    }
-
     const shell = window.electron.remote.shell;
     try {
         await shell.openPath(dirPath);
