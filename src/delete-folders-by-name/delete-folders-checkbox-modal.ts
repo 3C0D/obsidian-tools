@@ -69,7 +69,7 @@ export class DeleteFoldersCheckboxModal extends Modal {
                 description = `(contains ${parts.join(", ")})`;
             }
 
-            const setting = new Setting(folderListContainer)
+            new Setting(folderListContainer)
                 .setName(folder.path)
                 .setDesc(description)
                 .addToggle(toggle => {

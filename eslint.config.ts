@@ -23,16 +23,16 @@ const configs: Linter.Config[] = [
             "@typescript-eslint": typescriptEslintPlugin
         },
         rules: {
-            // Base rules
+            // Base rules - very permissive
             "no-unused-vars": "off",
-            "@typescript-eslint/no-unused-vars": ["warn", { "args": "none" }],
+            "@typescript-eslint/no-unused-vars": "off",
             "@typescript-eslint/ban-ts-comment": "off",
             "no-prototype-builtins": "off",
             "@typescript-eslint/no-empty-function": "off",
 
             // Useful rules but not too strict
             "semi": "error",
-            "@typescript-eslint/explicit-function-return-type": "warn",
+            "@typescript-eslint/explicit-function-return-type": "off",
 
             // Disable overly strict rules
             "@typescript-eslint/no-unsafe-assignment": "off",

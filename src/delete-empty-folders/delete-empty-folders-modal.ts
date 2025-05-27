@@ -1,4 +1,4 @@
-import { App, Modal, Setting, ToggleComponent, TFile, TFolder } from "obsidian";
+import { App, Modal, Setting, ToggleComponent, TFolder } from "obsidian";
 
 /**
  * Modal for confirming empty folder deletion with checkboxes for each folder
@@ -52,7 +52,7 @@ export class DeleteEmptyFoldersModal extends Modal {
 
         // Add checkboxes for each folder
         for (const folder of sortedFolders) {
-            const setting = new Setting(folderListContainer)
+            new Setting(folderListContainer)
                 .setName(folder.path)
                 .setDesc("(empty folder)")
                 .addToggle(toggle => {
