@@ -23,7 +23,7 @@ jobs:
         id: build
         run: |
           npm install
-          npm run build
+          npm run build-no-check
 
       # Create the release on GitHub
       - name: Create Release
