@@ -28,7 +28,7 @@ jobs:
       # Create the release on GitHub
       - name: Create Release
         id: create_release
-        uses: ncipollo/release-action@v1.13.0
+        uses: ncipollo/release-action@v1.16.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ github.ref }}
