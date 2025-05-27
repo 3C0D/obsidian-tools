@@ -6,7 +6,7 @@ import { registerDeleteFoldersByName } from "../delete-folders-by-name/delete-fo
 import { registerSearchFolders } from "../search-folders/search-folders.ts";
 import { addImportToVault } from "../import-to-vault/import-to-vault.ts";
 import { registerOutOfVault, createMoveFilesMenuCallback } from "../move-ou-from-vault/move-out-menus.ts";
-import { addDeleteEmptyFolders } from "../delete-empty-folders/delete-empty-folders.ts";
+import { addDeleteEmptyFolders, createDeleteEmptyFoldersMenu } from "../delete-empty-folders/delete-empty-folders.ts";
 
 
 export const DEFAULT_SETTINGS: Readonly<ToolsSettings> = {
@@ -27,7 +27,7 @@ export const settingsList: ToggleElement[] = [
         setting: "import-to-vault",
         callback: async function (app: App, plugin: Tools, value: boolean) {
             if (value) {
-                addImportToVault.call(this, app)
+                addImportToVault.call(plugin, app)
             } else {
                 const list = [
                     'obsidian-my-tools:move-files-to-vault', 'obsidian-my-tools:move-directory-to-vault', 'obsidian-my-tools:copy-files-to-vault', 'obsidian-my-tools:copy-directory-to-vault'
@@ -41,10 +41,10 @@ export const settingsList: ToggleElement[] = [
         setting: "move-out-from-vault",
         callback: async function (app: App, plugin: Tools, value: boolean) {
             if (value) {
-                registerOutOfVault.bind(this)()
+                registerOutOfVault.call(plugin, app)
             } else {
-                app.workspace.off("file-menu", createMoveFilesMenuCallback.bind(this)())
-                app.workspace.off("files-menu", createMoveFilesMenuCallback.bind(this)())
+                app.workspace.off("file-menu", createMoveFilesMenuCallback(app))
+                app.workspace.off("files-menu", createMoveFilesMenuCallback(app))
                 app.commands.executeCommandById('app:reload')
             }
         },
@@ -58,7 +58,8 @@ export const settingsList: ToggleElement[] = [
                 uninstaller()
             }
         },
-        name: "vault context menu"
+        name: "root context menu",
+        desc: "⚠️ Note: If you have the 'Root Folder Context Menu' plugin installed, consider disabling it to avoid conflicts. After disabling the conflicting plugin, you may need to toggle this setting OFF then ON again to restore the menu. Obsidian Tools provides the same functionality with a menu adapted to Obsidian Tools features."
     }, {
         setting: "delete-folders-by-name",
         callback: async function (app: App, plugin: Tools, value: boolean) {
@@ -97,10 +98,11 @@ export const settingsList: ToggleElement[] = [
             if (value) {
                 addDeleteEmptyFolders.call(plugin, app);
             } else {
-                // Remove the command if it's disabled
+                app.workspace.off("file-menu", createDeleteEmptyFoldersMenu(app));
                 app.commands.removeCommand('obsidian-my-tools:delete-empty-folders');
+                app.commands.executeCommandById('app:reload');
             }
         },
-        name: "delete empty folders"
+        name: "delete empty folders (when turned off a reload is done)"
     }
 ]

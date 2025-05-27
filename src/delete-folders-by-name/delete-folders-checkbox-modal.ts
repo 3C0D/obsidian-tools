@@ -76,6 +76,11 @@ export class DeleteFoldersCheckboxModal extends Modal {
                     toggle.setValue(true)
                         .onChange(value => {
                             this.selectedFolders.set(folder.path, value);
+
+                            // If checking a parent folder, also check all its children
+                            if (value) {
+                                this.selectChildFolders(folder.path);
+                            }
                         });
 
                     // Store reference to the toggle component
@@ -157,5 +162,25 @@ export class DeleteFoldersCheckboxModal extends Modal {
      */
     private countSubfolders(folder: TFolder): number {
         return folder.children.filter(child => child instanceof TFolder).length;
+    }
+
+    /**
+     * Select all child folders when a parent folder is selected
+     * @param parentPath - Path of the parent folder
+     */
+    private selectChildFolders(parentPath: string): void {
+        for (const folder of this.folders) {
+            // Check if this folder is a child of the parent
+            if (folder.path.startsWith(parentPath + '/')) {
+                // Update the selection state
+                this.selectedFolders.set(folder.path, true);
+
+                // Update the toggle UI
+                const toggle = this.toggles.get(folder.path);
+                if (toggle) {
+                    toggle.setValue(true);
+                }
+            }
+        }
     }
 }

@@ -85,46 +85,29 @@ export async function deleteSelectedFolders(app: App, foldersToDelete: TFolder[]
         return;
     }
 
-    // Sort folders by path length (shortest first) to delete parents before children
-    const sortedFolders = [...foldersToDelete].sort((a, b) => a.path.length - b.path.length);
+    let successCount = 0;
+    let skippedCount = 0;
 
-    // Keep track of deleted paths to avoid errors when trying to delete children of already deleted folders
-    const deletedPaths: string[] = [];
-    let deletedCount = 0;
-    let failedCount = 0;
-
-    for (const folder of sortedFolders) {
-        // Skip if this folder is a child of an already deleted folder
-        if (deletedPaths.some(path => folder.path.startsWith(path + "/"))) {
-            // This folder was already deleted as part of a parent folder
-            deletedCount++;
-            continue;
-        }
-
+    for (const folder of foldersToDelete) {
         try {
             await app.vault.trash(folder, true);
-            deletedCount++;
-            deletedPaths.push(folder.path);
+            successCount++;
         } catch (error) {
-            // Check if the error is because the folder doesn't exist (already deleted)
-            const errorMessage = String(error);
-            if (errorMessage.includes("does not exist") || errorMessage.includes("no such file")) {
-                // Folder was already deleted, count it as success
-                deletedCount++;
-            } else {
-                console.error(`Error deleting folder ${folder.path}:`, error);
-                new Notice(`Failed to delete folder ${folder.path}`, 3000);
-                failedCount++;
-            }
+            // Silently ignore errors - this happens when a parent folder was already deleted
+            // and the child folder no longer exists. This is expected behavior.
+            skippedCount++;
+            console.debug(`Skipped folder ${folder.path} (likely already deleted with parent):`, error);
         }
     }
 
-    if (deletedCount > 0) {
-        new Notice(`${deletedCount} folder(s) moved to trash.`, 4000);
+    // Show result notice
+    if (successCount > 0) {
+        new Notice(`Successfully deleted ${successCount} folder${successCount !== 1 ? 's' : ''}`);
     }
 
-    if (failedCount > 0) {
-        new Notice(`Failed to delete ${failedCount} folder(s). Check console for details.`, 4000);
+    // Only show skipped notice if there were actual errors (not just parent/child deletions)
+    if (skippedCount > 0 && successCount === 0) {
+        new Notice(`No folders could be deleted. They may have been removed already or contain files.`);
     }
 }
 

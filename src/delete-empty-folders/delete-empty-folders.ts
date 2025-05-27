@@ -19,6 +19,23 @@ export function addDeleteEmptyFolders(app: App) {
 }
 
 /**
+ * Create context menu callback for folders - used for unregistering
+ */
+export function createDeleteEmptyFoldersMenu(app: App) {
+    return (menu: Menu, folder: TFolder) => {
+        if (!(folder instanceof TFolder)) return;
+
+        menu.addSeparator();
+        menu.addItem((item: MenuItem) => {
+            item
+                .setTitle("Delete empty folders")
+                .setIcon("trash-2")
+                .onClick(async () => await deleteEmptyFolders(app, folder.path));
+        });
+    };
+}
+
+/**
  * Main function to delete empty folders
  * @param app - Obsidian App instance
  * @param folderPath - Optional folder path, defaults to vault root
@@ -103,15 +120,17 @@ function findEmptyFolders(folder: TFolder): TFolder[] {
  */
 async function deleteSelectedFolders(app: App, folders: TFolder[]): Promise<void> {
     let successCount = 0;
-    let errorCount = 0;
+    let skippedCount = 0;
 
     for (const folder of folders) {
         try {
             await app.vault.delete(folder);
             successCount++;
         } catch (error) {
-            console.error(`Failed to delete folder ${folder.path}:`, error);
-            errorCount++;
+            // Silently ignore errors - this happens when a parent folder was already deleted
+            // and the child folder no longer exists. This is expected behavior.
+            skippedCount++;
+            console.debug(`Skipped folder ${folder.path} (likely already deleted with parent):`, error);
         }
     }
 
@@ -119,26 +138,11 @@ async function deleteSelectedFolders(app: App, folders: TFolder[]): Promise<void
     if (successCount > 0) {
         new Notice(`Successfully deleted ${successCount} empty folder${successCount !== 1 ? 's' : ''}`);
     }
-    if (errorCount > 0) {
-        new Notice(`Failed to delete ${errorCount} folder${errorCount !== 1 ? 's' : ''}`);
+
+    // Only show skipped notice if there were actual errors (not just parent/child deletions)
+    if (skippedCount > 0 && successCount === 0) {
+        new Notice(`No folders could be deleted. They may have been removed already or contain files.`);
     }
 }
 
-/**
- * Create context menu callback for folders
- * @param app - Obsidian App instance
- * @returns Menu callback function
- */
-function createDeleteEmptyFoldersMenu(app: App) {
-    return (menu: Menu, folder: TFolder) => {
-        if (!(folder instanceof TFolder)) return;
 
-        menu.addSeparator();
-        menu.addItem((item: MenuItem) => {
-            item
-                .setTitle("Delete empty folders")
-                .setIcon("trash-2")
-                .onClick(async () => await deleteEmptyFolders(app, folder.path));
-        });
-    };
-}

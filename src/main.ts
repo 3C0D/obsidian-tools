@@ -4,10 +4,10 @@ import { DEFAULT_SETTINGS } from "./types/variables.ts";
 import { showVaultChooserModal } from "./utils.ts";
 import type { ToolsSettings } from "obsidian-typings";
 import { registerVaultContextMenu } from "./vaultContextMenu.ts";
-import { registerDeleteFoldersByName } from "./delete-folders-by-name/delete-folders-by-name.ts";
-import { registerSearchFolders } from "./search-folders/search-folders.ts";
 import { registerOutOfVault } from "./move-ou-from-vault/move-out-menus.ts";
 import { addImportToVault } from "./import-to-vault/import-to-vault.ts";
+import { registerDeleteFoldersByName } from "./delete-folders-by-name/delete-folders-by-name.ts";
+import { registerSearchFolders } from "./search-folders/search-folders.ts";
 import { addDeleteEmptyFolders } from "./delete-empty-folders/delete-empty-folders.ts";
 
 

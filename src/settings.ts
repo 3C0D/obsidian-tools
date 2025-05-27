@@ -32,6 +32,11 @@ export class ToolsSettingTab extends PluginSettingTab {
                             await el.callback.call(this, this.app, this.plugin, value)
                         })
                 }).setName(el.name)
+
+            // Add description if available
+            if (el.desc) {
+                setting.setDesc(el.desc);
+            }
         }
     }
 }

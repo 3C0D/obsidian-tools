@@ -21,6 +21,7 @@ declare module "obsidian-typings" {
     setting: string;
     callback: (app: App, plugin: Tools, value: boolean) => Promise<void>;
     name: string;
+    desc?: string;
   }
 }
 
