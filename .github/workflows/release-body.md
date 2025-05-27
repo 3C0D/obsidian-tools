@@ -1,1 +1,1 @@
-delete empty folders
+delete folder empty
