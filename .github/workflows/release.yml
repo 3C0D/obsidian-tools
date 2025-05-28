@@ -23,8 +23,7 @@ jobs:
         id: build
         run: |
           npm install
-          npm run build -- --skipLibCheck
-          # npm run build-no-check
+          npm run build-no-check
 
       # Create the release on GitHub
       - name: Create Release

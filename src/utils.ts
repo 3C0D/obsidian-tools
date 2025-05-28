@@ -5,15 +5,8 @@ import { readFileSync } from "fs"
 import { VaultChooser } from "./vaultsModal.ts";
 import { migrateProfile } from "./migratetProfile.ts";
 
-declare global {
-    interface Window {
-        electron: any;
-        require: NodeRequire;
-    }
-}
-
 export async function picker(message: string, properties: string[]) {
-    const dirPath = window.electron.remote.dialog.showOpenDialogSync({
+    const dirPath = (window.electron as any).remote.dialog.showOpenDialogSync({
         title: message,
         properties
     });
@@ -24,7 +17,7 @@ export async function picker(message: string, properties: string[]) {
 
 export async function openDirectoryInFileManager(dirPath: string) {
     try {
-        await window.electron.remote.shell.openPath(dirPath);
+        await (window.electron as any).remote.shell.openPath(dirPath);
     } catch (err) {
         console.error(err);
     }

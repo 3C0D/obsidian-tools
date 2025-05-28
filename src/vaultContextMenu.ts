@@ -2,6 +2,7 @@ import { around } from "monkey-around";
 import { App, Menu, Notice, TAbstractFile, TFolder } from "obsidian";
 import type { FileExplorerView } from "obsidian-typings";
 import { InternalPluginName } from 'obsidian-typings/implementations';
+import { registerDeleteFoldersByName } from "./delete-folders-by-name/delete-folders-by-name.ts";
 
 type OpenFileCM = FileExplorerView['openFileContextMenu']
 type OpenFileCMArgs = Parameters<OpenFileCM>
@@ -76,38 +77,35 @@ function handleFileMenuEvent(menu: Menu, file: TAbstractFile): void {
         return;
     }
 
-    // Action IDs for the specific actions to remove: "Make a copy" and "Rename..."
-    const actionIdsToRemove = [
-        'file-explorer:duplicate-file',  // Make a copy
-        'file-explorer:rename-file'      // Rename...
+    // Utiliser les mêmes clés de localisation que le plugin original
+    const localizationKeys = [
+        'plugins.file-explorer.action-move-folder',
+        'plugins.file-explorer.menu-opt-delete',
+        'plugins.file-explorer.menu-opt-make-copy',
+        'plugins.file-explorer.menu-opt-rename',
+        'plugins.search.menu-opt-search-in-folder'
     ];
 
-    // Filter out the unwanted menu items by checking their action IDs
-    menu.items = menu.items.filter((item) => {
-        // Check if the item has an action ID that we want to remove
-        const actionId = (item as any).actionId || (item as any).id;
-        if (actionId && actionIdsToRemove.includes(actionId)) {
-            return false;
-        }
+    // Obtenir les titres localisés
+    const localizedTitles = localizationKeys.map((key) => 
+        window.i18next.t(key)
+    );
 
-        // Fallback: also check by text content for robustness
-        const localizationKeys = [
-            'plugins.file-explorer.menu-opt-make-copy',
-            'plugins.file-explorer.menu-opt-rename'
-        ];
-        const localizedTitles = localizationKeys.map((key) => (window as any).i18next?.t(key) || key);
-        const commonTitles = ['Make a copy', 'Rename...'];
-        const titlesToRemove = [...localizedTitles, ...commonTitles];
+    // Filtrer les éléments de menu indésirables
+    menu.items = menu.items.filter((item) => 
+        !localizedTitles.includes(item.titleEl?.textContent ?? '')
+    );
 
-        let itemText = '';
-        if (typeof item.titleEl === 'string') {
-            itemText = item.titleEl;
-        } else if (item.titleEl && typeof item.titleEl === 'object' && 'textContent' in item.titleEl) {
-            itemText = (item.titleEl as any).textContent || '';
-        }
-        itemText = itemText.trim();
-
-        return !titlesToRemove.includes(itemText);
-    });
+    // Add "Delete folders by name" option if the feature is enabled
+    const plugin = (window as any).app.plugins.plugins["obsidian-my-tools"];
+    if (plugin && plugin.settings["delete-folders-by-name"]) {
+        menu.addSeparator();
+        menu.addItem((item) => {
+            item
+                .setTitle("Delete folders by name")
+                .setIcon("trash-2")
+                .onClick(() => registerDeleteFoldersByName(this.app));
+        });
+    }
 }
 
