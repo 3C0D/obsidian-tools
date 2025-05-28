@@ -85,10 +85,14 @@ export async function deleteSelectedFolders(app: App, foldersToDelete: TFolder[]
         return;
     }
 
+    // Sort folders by path length (shortest first)
+    // to delete parent folders before children
+    const sortedFolders = [...foldersToDelete].sort((a, b) => a.path.length - b.path.length);
+
     let successCount = 0;
     let skippedCount = 0;
 
-    for (const folder of foldersToDelete) {
+    for (const folder of sortedFolders) {
         try {
             await app.vault.trash(folder, true);
             successCount++;
@@ -133,3 +137,5 @@ export function registerDeleteFoldersByName(app: App): void {
     const folders = getAllFolders(app);
     new FolderSuggestModal(app, folders).open();
 }
+
+

@@ -108,7 +108,7 @@ export class DeleteEmptyFoldersModal extends Modal {
                     .onClick(() => {
                         // Get only the selected folders
                         const selectedFolders = this.folders.filter(folder =>
-                            this.selectedFolders.get(folder.path)
+                            this.selectedFolders.get(folder.path) // boolean
                         );
 
                         if (selectedFolders.length === 0) {
