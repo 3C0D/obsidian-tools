@@ -1,1 +1,1 @@
-fix: delete folder by name improved delete (sorted)
+build fixed electron and code improved until vaultsmodal
