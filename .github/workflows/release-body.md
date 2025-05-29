@@ -1,1 +1,1 @@
- Smart Vault Import/Export System
+delete folder by name added to root context menu
