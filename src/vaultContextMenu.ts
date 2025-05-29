@@ -3,6 +3,7 @@ import { App, Menu, Notice, TAbstractFile, TFolder } from "obsidian";
 import type { FileExplorerView } from "obsidian-typings";
 import { InternalPluginName } from 'obsidian-typings/implementations';
 import { registerDeleteFoldersByName } from "./delete-folders-by-name/delete-folders-by-name.ts";
+import { deleteEmptyFolders } from "./delete-empty-folders/delete-empty-folders.ts";
 
 type OpenFileCM = FileExplorerView['openFileContextMenu']
 type OpenFileCMArgs = Parameters<OpenFileCM>
@@ -105,6 +106,17 @@ function handleFileMenuEvent(menu: Menu, file: TAbstractFile): void {
                 .setTitle("Delete folders by name")
                 .setIcon("trash-2")
                 .onClick(() => registerDeleteFoldersByName(this.app));
+        });
+    }
+    
+    // Add "Delete empty folders" option if the feature is enabled
+    if (plugin && plugin.settings["delete-empty-folders"]) {
+        menu.addSeparator();
+        menu.addItem((item) => {
+            item
+                .setTitle("Delete empty folders")
+                .setIcon("trash-2")
+                .onClick(async () => await deleteEmptyFolders(this.app));
         });
     }
 }
