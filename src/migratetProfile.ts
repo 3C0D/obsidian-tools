@@ -107,7 +107,23 @@ async function migrateVaultJsonFiles(plugin: Tools, app: App, dirPath: string, i
                 destinationContent = await fs.readJson(destinationPath);
             }
 
-            const mergedContent = { ...destinationContent, ...sourceContent };
+            let mergedContent;
+
+            // Handle arrays (like community-plugins.json) with additive merging
+            if (Array.isArray(sourceContent) && Array.isArray(destinationContent)) {
+                // Combine arrays and remove duplicates
+                mergedContent = [...new Set([...destinationContent, ...sourceContent])];
+            } else if (Array.isArray(sourceContent)) {
+                // Source is array, destination is not - use source
+                mergedContent = sourceContent;
+            } else if (Array.isArray(destinationContent)) {
+                // Destination is array, source is not - keep destination
+                mergedContent = destinationContent;
+            } else {
+                // Both are objects - merge normally
+                mergedContent = { ...destinationContent, ...sourceContent };
+            }
+
             await fs.writeJson(destinationPath, mergedContent, { spaces: 2 });
         } catch (error) {
             console.error(`Error processing ${key}.json:`, error);

@@ -22,7 +22,8 @@ declare module "obsidian-typings" {
 
   interface ToolsSettings extends toToggle {
     vaultDirs: Record<string, boolean>,
-    vaultFiles: Record<string, boolean>
+    vaultFiles: Record<string, boolean>,
+    selectedPlugins: Record<string, boolean>
   }
 
   interface ToggleElement {

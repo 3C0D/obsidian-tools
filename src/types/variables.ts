@@ -18,7 +18,8 @@ export const DEFAULT_SETTINGS: Readonly<ToolsSettings> = {
     "search-folders": true,
     "delete-empty-folders": true,
     vaultDirs: {},
-    vaultFiles: {}
+    vaultFiles: {},
+    selectedPlugins: {}
 };
 
 export const settingsList: ToggleElement[] = [
