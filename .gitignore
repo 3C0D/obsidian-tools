@@ -27,3 +27,7 @@ data.json
 
 # scss result
 main.css
+
+# Added by centralized config
+.vscode/*
+!.vscode/settings.json
