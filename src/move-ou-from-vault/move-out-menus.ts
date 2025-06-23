@@ -11,7 +11,7 @@ export function registerOutOfVault(app: App): void {
 }
 
 export function createMoveFilesMenuCallback(app: App) {
-    return (menu: Menu, files: TFile | TFolder | (TFile | TFolder)[]) => {
+    return (menu: Menu, files: TFile | TFolder | (TFile | TFolder)[]): void => {
         const fileArray = Array.isArray(files) ? files : [files];
 
         if (fileArray.length === 1 && fileArray[0].path === "/") return;//vauult switcher contextmenu

@@ -22,7 +22,7 @@ export async function moveOutOfVault(app: App, files: (TFile | TFolder)[], job: 
 	const attached = new Set<TFile>();
 
 	for (const file of files) {
-		const links = await hasResolvedLinks(app, file)
+		const links = await hasResolvedLinks(app, file);
 		links.forEach((link) => attached.add(link));
 		if (await fileAlreadyInDest(app, file, selectedPaths)) {
 			runModal = true;
@@ -45,8 +45,8 @@ export async function moveOutOfVault(app: App, files: (TFile | TFolder)[], job: 
 
 async function hasResolvedLinks(app: App, file: TFile | TFolder): Promise<TFile[]> {
 	if (file instanceof TFolder) return [];
-	const fileLinks: Record<string, number> = app.metadataCache.resolvedLinks[file.path]
-	const paths = Object.keys(fileLinks)
+	const fileLinks: Record<string, number> = app.metadataCache.resolvedLinks[file.path];
+	const paths = Object.keys(fileLinks);
 	if (!paths.length) return [];
 
 	const LinkFiles: TFile[] = [];

@@ -4,7 +4,7 @@ import { DeleteEmptyFoldersModal } from "./delete-empty-folders-modal.ts";
 /**
  * Add delete empty folders functionality to the plugin
  */
-export function addDeleteEmptyFolders(app: App) {
+export function addDeleteEmptyFolders(app: App): void {
     // Add command for deleting empty folders from root
     this.addCommand({
         id: 'delete-empty-folders',
@@ -22,7 +22,7 @@ export function addDeleteEmptyFolders(app: App) {
  * Create context menu callback for folders - used for unregistering
  */
 export function createDeleteEmptyFoldersMenu(app: App) {
-    return (menu: Menu, folder: TFolder) => {
+    return (menu: Menu, folder: TFolder): void => {
         if (!(folder instanceof TFolder)) return;
 
         menu.addSeparator();

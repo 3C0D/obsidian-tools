@@ -11,7 +11,7 @@ export class VaultChooser extends Modal {
         this.onSubmit = onSubmit;
     }
 
-    onOpen() {
+    onOpen(): void {
         const { contentEl } = this;
         
         contentEl.createEl("h3", { text: this.source ? "Select the source vault" : "Select the destination vault" });
@@ -42,15 +42,15 @@ export class VaultChooser extends Modal {
                     }));
 
         getVaultPaths(this.app).forEach((_path: string) => {
-            this.createVaultButtons(contentEl, _path)
-        })
+            this.createVaultButtons(contentEl, _path);
+        });
     }
 
-    onClose() {
+    onClose(): void {
         this.contentEl.empty();
     }
 
-    createVaultButtons(El: HTMLElement, _path: string) {
+    createVaultButtons(El: HTMLElement, _path: string): void {
         const vaultDir: string = path.dirname(_path);
         const vaultName: string = path.basename(_path);
 
@@ -63,7 +63,7 @@ export class VaultChooser extends Modal {
                     .setCta()
                     .setIcon("checkmark")
                     .onClick(() => {
-                        this.onSubmit(_path)
+                        this.onSubmit(_path);
                     });
             });
         

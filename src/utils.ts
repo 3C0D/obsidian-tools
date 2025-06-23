@@ -1,21 +1,21 @@
 import * as path from "path";
 import * as os from "os";
 import { App, Notice, Platform } from "obsidian";
-import { readFileSync } from "fs"
+import { readFileSync } from "fs";
 import { VaultChooser } from "./vaultsModal.ts";
 import { migrateProfile } from "./migratetProfile.ts";
 
-export async function picker(message: string, properties: string[]) {
+export async function picker(message: string, properties: string[]): Promise<string | string[] | undefined> {
     const dirPath = (window.electron as any).remote.dialog.showOpenDialogSync({
         title: message,
         properties
     });
-    if (!dirPath) return
-    if (properties.includes("multiSelections")) return dirPath
+    if (!dirPath) return;
+    if (properties.includes("multiSelections")) return dirPath;
     else return dirPath[0];
 }
 
-export async function openDirectoryInFileManager(dirPath: string) {
+export async function openDirectoryInFileManager(dirPath: string): Promise<void> {
     try {
         await (window.electron as any).remote.shell.openPath(dirPath);
     } catch (err) {
@@ -33,9 +33,9 @@ function getVaultsConfigPath(): string | null {
     } else if (Platform.isLinux) {
         return path.join(userDir, '.config', 'obsidian', 'obsidian.json');
     } else {
-        console.error("platform not supported")
-        new Notice("platform not supported")
-        return null
+        console.error("platform not supported");
+        new Notice("platform not supported");
+        return null;
     }
 }
 
@@ -85,7 +85,7 @@ export function getVaultPaths(app: App): string[] {
     return [];
 }
 
-export function showVaultChooserModal(app: App, isImport: boolean) {
+export function showVaultChooserModal(app: App, isImport: boolean): void {
     new VaultChooser(app, isImport, (result) => {
         migrateProfile(this, app, isImport, result).catch((error) => {
             console.error(`Error during ${isImport ? 'import' : 'export'}:`, error);

@@ -5,7 +5,8 @@ import {
   askQuestion,
   cleanInput,
   createReadlineInterface,
-  gitExec
+  gitExec,
+  ensureGitSync
 } from "./utils.js";
 
 const rl = createReadlineInterface();
@@ -48,6 +49,9 @@ async function main(): Promise<void> {
 
     // get current branch name
     const currentBranch = execSync("git rev-parse --abbrev-ref HEAD").toString().trim();
+
+    // Ensure Git is synchronized before pushing
+    await ensureGitSync();
 
     try {
       gitExec(`git push origin ${currentBranch}`);

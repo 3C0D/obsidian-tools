@@ -20,7 +20,7 @@ export class DeleteEmptyFoldersModal extends Modal {
         }
     }
 
-    onOpen() {
+    onOpen(): void {
         const { contentEl } = this;
         contentEl.empty();
 
@@ -129,7 +129,7 @@ export class DeleteEmptyFoldersModal extends Modal {
             });
     }
 
-    onClose() {
+    onClose(): void {
         this.contentEl.empty();
     }
 

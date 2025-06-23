@@ -14,7 +14,7 @@ import { addDeleteEmptyFolders } from "./delete-empty-folders/delete-empty-folde
 export default class Tools extends Plugin {
 	settings: ToolsSettings;
 
-	async onload() {
+	async onload(): Promise<void>	 {
 		await this.loadSettings();
 		this.addSettingTab(new ToolsSettingTab(this.app, this));
 
@@ -22,15 +22,15 @@ export default class Tools extends Plugin {
 		this.registerPluginCommands();
 	}
 
-	private async loadSettings() {
+	private async loadSettings(): Promise<void> {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
 	}
 
-	async saveSettings() {
+	async saveSettings(): Promise<void> {
 		await this.saveData(this.settings);
 	}
 
-	private initializeFeaturesBasedOnSettings() {
+	private initializeFeaturesBasedOnSettings(): void {
 		if (this.settings['move-out-from-vault']) {
 			registerOutOfVault.call(this, this.app);
 		}
@@ -69,7 +69,7 @@ export default class Tools extends Plugin {
 		}
 	}
 
-	private registerPluginCommands() {
+	private registerPluginCommands(): void {
 		// Always register these core commands
 		this.addCommand({
 			id: 'import-vault-profile',

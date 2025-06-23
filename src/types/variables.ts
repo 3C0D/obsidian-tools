@@ -26,44 +26,44 @@ export const settingsList: ToggleElement[] = [
     // Search from directory is now native in Obsidian
     {
         setting: "import-to-vault",
-        callback: async function (app: App, plugin: Tools, value: boolean) {
+        callback: async function (app: App, plugin: Tools, value: boolean): Promise<void> {
             if (value) {
-                addImportToVault.call(plugin, app)
+                addImportToVault.call(plugin, app);
             } else {
                 const list = [
                     'obsidian-my-tools:move-files-to-vault', 'obsidian-my-tools:move-directory-to-vault', 'obsidian-my-tools:copy-files-to-vault', 'obsidian-my-tools:copy-directory-to-vault'
-                ]
+                ];
 
-                for (const command of list) app.commands.removeCommand(command)
+                for (const command of list) app.commands.removeCommand(command);
             }
         },
         name: "move/copy to vault"
     }, {
         setting: "move-out-from-vault",
-        callback: async function (app: App, plugin: Tools, value: boolean) {
+        callback: async function (app: App, plugin: Tools, value: boolean): Promise<void> {
             if (value) {
-                registerOutOfVault.call(plugin, app)
+                registerOutOfVault.call(plugin, app);
             } else {
-                app.workspace.off("file-menu", createMoveFilesMenuCallback(app))
-                app.workspace.off("files-menu", createMoveFilesMenuCallback(app))
-                app.commands.executeCommandById('app:reload')
+                app.workspace.off("file-menu", createMoveFilesMenuCallback(app));
+                app.workspace.off("files-menu", createMoveFilesMenuCallback(app));
+                app.commands.executeCommandById('app:reload');
             }
         },
         name: "move out from vault (when turned off a reload is done)"
     }, {
         setting: "vault-context-menu",
-        callback: async function (app: App, plugin: Tools, value: boolean) {
+        callback: async function (app: App, plugin: Tools, value: boolean): Promise<void> {
             if (value) {
-                registerVaultContextMenu.call(plugin)
+                registerVaultContextMenu.call(plugin);
             } else {
-                uninstaller()
+                uninstaller();
             }
         },
         name: "root context menu",
         desc: "⚠️ Note: If you have the 'Root Folder Context Menu' plugin installed, consider disabling it to avoid conflicts. After disabling the conflicting plugin, you may need to toggle this setting OFF then ON again to restore the menu. Obsidian Tools provides the same functionality with a menu adapted to Obsidian Tools features."
     }, {
         setting: "delete-folders-by-name",
-        callback: async function (app: App, plugin: Tools, value: boolean) {
+        callback: async function (app: App, plugin: Tools, value: boolean): Promise<void> {
             if (value) {
                 // Add the command if it's enabled
                 plugin.addCommand({
@@ -79,7 +79,7 @@ export const settingsList: ToggleElement[] = [
         name: "delete folders by name"
     }, {
         setting: "search-folders",
-        callback: async function (app: App, plugin: Tools, value: boolean) {
+        callback: async function (app: App, plugin: Tools, value: boolean): Promise<void> {
             if (value) {
                 // Add the command if it's enabled
                 plugin.addCommand({
@@ -95,7 +95,7 @@ export const settingsList: ToggleElement[] = [
         name: "search folders"
     }, {
         setting: "delete-empty-folders",
-        callback: async function (app: App, plugin: Tools, value: boolean) {
+        callback: async function (app: App, plugin: Tools, value: boolean): Promise<void> {
             if (value) {
                 addDeleteEmptyFolders.call(plugin, app);
             } else {
@@ -106,4 +106,4 @@ export const settingsList: ToggleElement[] = [
         },
         name: "delete empty folders (when turned off a reload is done)"
     }
-]
+];

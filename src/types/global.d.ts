@@ -1,14 +1,6 @@
 import { App } from "obsidian";
 import type Tools from "../main.ts";
 
-// declare global {
-//   interface Window {
-//     i18next: {
-//       t(key: string): string;
-//     };
-//   }
-// }
-
 declare module "obsidian-typings" {
   interface toToggle {
     "move-out-from-vault": boolean;

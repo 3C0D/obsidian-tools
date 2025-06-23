@@ -32,6 +32,11 @@
   },
   "include": [
     "./src/**/*.ts",
-    "./scripts/**/*.ts"
+    "./scripts/**/*.ts",
+    "eslint.config.fix.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "eslint.config.ts"
   ]
 }

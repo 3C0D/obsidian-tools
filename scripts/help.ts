@@ -1,46 +1,51 @@
 #!/usr/bin/env tsx
 
 console.log(`
-Obsidian Plugin Config - Command Reference
-Système d'injection pour plugins Obsidian autonomes
+🎯 Obsidian Plugin - Quick Help
+Available commands in this autonomous plugin
 
-STRATÉGIE NPM GLOBAL:
-  npm install -g obsidian-plugin-config    # Installation globale (une seule fois)
-  obsidian-inject                          # Injection depuis n'importe où
-  obsidian-inject /chemin/vers/plugin      # Injection par chemin
+═══════════════════════════════════════════════════════════════════
 
-INJECTION LOCALE (développement):
-  yarn inject-path <chemin>        Injection par chemin depuis plugin-config
-  yarn inject <chemin>             Alias pour inject-path
+📋 MAIN COMMANDS
 
-MIGRATION (développement):
-  yarn migrate, m <chemin>         Migration plugin vers architecture centralisée
-  yarn migrate --dry-run           Aperçu des changements sans appliquer
+DEVELOPMENT:
+  yarn start                       # Install dependencies + start dev
+  yarn dev                         # Build dev mode with hot reload
+  yarn build                       # Build production
+  yarn real                        # Build + install in real vault
+  yarn lint, lint:fix             # ESLint verification/correction
 
-MAINTENANCE:
-  yarn acp                         Add, commit, and push changes
-  yarn update-version, v           Update version
-  yarn help, h                     Afficher cette aide
+VERSION & RELEASE:
+  yarn v, update-version           # Update version (package.json + manifest.json)
+  yarn release, r                  # Create GitHub release with tag
 
-EXEMPLES D'UTILISATION:
-  # Installation globale (recommandée)
-  npm install -g obsidian-plugin-config
-  cd mon-plugin && obsidian-inject
+GIT OPERATIONS:
+  yarn acp                         # Add, commit, push (with Git sync)
+  yarn bacp                        # Build + add, commit, push
+  yarn run help, h                 # This help
 
-  # Développement local
-  yarn inject-path "../mon-plugin"
-  yarn inject "C:\\Users\\dev\\plugins\\mon-plugin"
+═══════════════════════════════════════════════════════════════════
 
-CE QUI EST INJECTÉ:
-  ✅ Scripts locaux (esbuild.config.ts, acp.ts, utils.ts, etc.)
-  ✅ Configuration package.json (scripts, dépendances)
-  ✅ Protection yarn obligatoire
-  ✅ Installation automatique des dépendances
+🚀 TYPICAL WORKFLOW
 
-ARCHITECTURE:
-  - Plugin devient AUTONOME avec scripts locaux
-  - Aucune dépendance externe requise après injection
-  - Mise à jour possible via re-injection
+  1. yarn start                    # Initial setup
+  2. yarn dev                      # Daily development
+  3. yarn build                    # Test production build
+  4. yarn v                        # Update version
+  5. yarn release                  # Publish GitHub release
 
-COMPTE NPM: 3c0d (connecté)
+═══════════════════════════════════════════════════════════════════
+
+⚙️ CONFIGURATION
+
+ENVIRONMENT:
+  - Edit .env to define TEST_VAULT and REAL_VAULT
+  - Autonomous scripts (no external dependencies)
+  - Automatic Git sync verification before push
+
+AUTONOMOUS PLUGIN:
+  ✅ Independent local scripts
+  ✅ Integrated TypeScript and ESLint configuration
+  ✅ GitHub Actions workflows with Yarn
+  ✅ No dependency on obsidian-plugin-config
 `);

@@ -33,7 +33,7 @@ export class PluginSelectionModal extends Modal {
         super(app);
     }
 
-    async onOpen() {
+    async onOpen(): Promise<void> {
         const { contentEl } = this;
         contentEl.empty();
 
@@ -135,7 +135,7 @@ export class PluginSelectionModal extends Modal {
             });
     }
 
-    onClose() {
+    onClose(): void {
         this.contentEl.empty();
     }
 

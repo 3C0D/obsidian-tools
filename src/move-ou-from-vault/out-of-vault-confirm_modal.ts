@@ -12,7 +12,7 @@ export class OutFromVaultConfirmModal extends Modal {
 		super(app);
 		this.attachedAfterToggle = attached;
 	}
-	onOpen() {
+	onOpen(): void {
 		// modal size
 		this.modalEl.style.width = `500px`;
 		this.modalEl.style.height = `350px`;
@@ -25,11 +25,11 @@ export class OutFromVaultConfirmModal extends Modal {
 			new Setting(contentEl)
 				.setName("Join attached resolved links")
 				.addToggle((toggle) => {
-					toggle.setValue(true)
+					toggle.setValue(true);
 					toggle.onChange(async (value) => {
-						this.attachedAfterToggle = value ? this.attached : []
-					})
-				})
+						this.attachedAfterToggle = value ? this.attached : [];
+					});
+				});
 		}
 		if (this.runModal) {
 			new Setting(contentEl)
@@ -63,7 +63,7 @@ export class OutFromVaultConfirmModal extends Modal {
 							this.close();
 							this.onSubmit({ pastOption: 0, attached: this.attachedAfterToggle });
 						});
-				})
+				});
 		}
 
 		new Setting(contentEl)
@@ -75,7 +75,7 @@ export class OutFromVaultConfirmModal extends Modal {
 			});
 
 	}
-	onClose() {
+	onClose(): void {
 		this.contentEl.empty();
 	}
 }

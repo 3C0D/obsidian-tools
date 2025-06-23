@@ -8,7 +8,7 @@ import { deleteEmptyFolders } from "./delete-empty-folders/delete-empty-folders.
 type OpenFileCM = FileExplorerView['openFileContextMenu']
 type OpenFileCMArgs = Parameters<OpenFileCM>
 
-let fileExplorerView: FileExplorerView
+let fileExplorerView: FileExplorerView;
 export let uninstaller: () => void;
 
 /**
@@ -27,13 +27,13 @@ export function checkForConflictingPlugin(app: App): void {
     }
 }
 
-export function registerVaultContextMenu() {
+export function registerVaultContextMenu(): void {
     // Check for conflicting plugin
     checkForConflictingPlugin(this.app);
 
     fileExplorerView = this.app.workspace.getLeavesOfType(InternalPluginName.FileExplorer)[0].view;
 
-    uninstaller = openFileContextMenuWrapper()
+    uninstaller = openFileContextMenuWrapper();
 
     this.register(uninstaller);
 
@@ -50,23 +50,23 @@ export function registerVaultContextMenu() {
     this.registerEvent(this.app.workspace.on('file-menu', handleFileMenuEvent));
 }
 
-function openFileContextMenuWrapper() {
+function openFileContextMenuWrapper(): () => void {
     return around(Object.getPrototypeOf(fileExplorerView), {
         openFileContextMenu(old: OpenFileCM): OpenFileCM {
             return function (...args: OpenFileCMArgs): void {
-                if (!fileExplorerView) return old.apply(this, args)
+                if (!fileExplorerView) return old.apply(this, args);
                 const file = this.files?.get(args[1]?.parentElement);
                 if (!file || !(file instanceof TFolder)) {
                     return old.apply(this, args);
                 }
                 // Temporarily override isRoot
                 const originalIsRoot = file.isRoot;
-                file.isRoot = () => false;
+                file.isRoot = (): boolean => false;
                 old.apply(this, args);
                 file.isRoot = originalIsRoot;
-            }
+            };
         }
-    })
+    });
 }
 
 /**

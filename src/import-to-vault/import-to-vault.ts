@@ -6,38 +6,38 @@ import { OutFromVaultConfirmModal } from "../move-ou-from-vault/out-of-vault-con
 import { picker } from "../utils.ts";
 
 
-export function addImportToVault(app: App) {
+export function addImportToVault(app: App): void {
     this.addCommand({
         id: 'import-files-to-vault',
         name: 'Import file(s) to Vault',
         callback: async () => {
-            await importToVault(app, false, true)
+            await importToVault(app, false, true);
         }
-    })
+    });
 
     this.addCommand({
         id: 'import-directory-to-vault',
         name: 'Import directory to Vault',
         callback: async () => {
-            await importToVault(app, true, true)
+            await importToVault(app, true, true);
         }
-    })
+    });
 
     this.addCommand({
         id: 'copy-files-to-vault',
         name: 'Copy file(s) to Vault',
         callback: async () => {
-            await importToVault(app, false, false)
+            await importToVault(app, false, false);
         }
-    })
+    });
 
     this.addCommand({
         id: 'copy-directory-to-vault',
         name: 'Copy directory to Vault',
         callback: async () => {
-            await importToVault(app, true, false)
+            await importToVault(app, true, false);
         }
-    })
+    });
 
     this.registerEvent(app.workspace.on("file-menu", createMTVFolderMenu(app)));
 }
@@ -73,7 +73,7 @@ export async function importToVault(app: App, directory: boolean, move: boolean,
     }
 }
 
-async function processFiles(selectedPaths: string[], destinationPath: string, move: boolean, pastOption = 0) {
+async function processFiles(selectedPaths: string[], destinationPath: string, move: boolean, pastOption = 0): Promise<void> {
     for (const p of selectedPaths) {
         const fileName = path.basename(p);
         let destination = path.join(destinationPath, fileName);
@@ -97,7 +97,7 @@ async function processFiles(selectedPaths: string[], destinationPath: string, mo
 }
 
 function createMTVFolderMenu(app: App) {
-    return (menu: Menu, folder: TFolder) => {
+    return (menu: Menu, folder: TFolder): void => {
         const isFolder = folder instanceof TFolder;
         if (!isFolder) return;
 
@@ -105,7 +105,7 @@ function createMTVFolderMenu(app: App) {
         menu.addItem(async (item) => {
             item.setTitle("Import to folder").setIcon("folder-input");
             const submenu = item.setSubmenu();
-            const addSubMenuItem = (title: string, icon: string, directory: boolean, move: boolean) => {
+            const addSubMenuItem = (title: string, icon: string, directory: boolean, move: boolean): void => {
                 submenu.addItem((item: MenuItem) => {
                     item
                         .setTitle(title)
@@ -115,15 +115,15 @@ function createMTVFolderMenu(app: App) {
             };
             submenu.addItem((item) => {
                 item.setIsLabel(true).setTitle("Import file(s)");
-            })
+            });
             addSubMenuItem("Copy", "copy", false, false);
             addSubMenuItem("Cut", "scissors", false, true);
             submenu.addSeparator();
             submenu.addItem((item) => {
                 item.setIsLabel(true).setTitle("Import folder(s)");
-            })
+            });
             addSubMenuItem("Copy", "copy", true, false);
             addSubMenuItem("Cut", "scissors", true, true);
-        })
-    }
+        });
+    };
 }

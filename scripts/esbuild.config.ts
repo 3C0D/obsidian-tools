@@ -31,40 +31,7 @@ async function promptForVaultPath(envKey: string): Promise<string> {
   return path;
 }
 
-async function promptForBothVaults(): Promise<void> {
-  console.log(`❓ Both vault paths are required for external development`);
-  console.log(`   TEST_VAULT: for development and testing (yarn dev)`);
-  console.log(`   REAL_VAULT: for final plugin installation (yarn real)`);
 
-  let confirmed = false;
-  while (!confirmed) {
-    const testPath = await askQuestion(`📝 Enter your test vault path: `, rl);
-    if (!testPath) {
-      console.log('❌ No test vault path provided, exiting...');
-      process.exit(1);
-    }
-
-    const realPath = await askQuestion(`📝 Enter your real vault path: `, rl);
-    if (!realPath) {
-      console.log('❌ No real vault path provided, exiting...');
-      process.exit(1);
-    }
-
-    // Show confirmation
-    console.log(`\n📋 Vault paths entered:`);
-    console.log(`   TEST_VAULT: ${testPath}`);
-    console.log(`   REAL_VAULT: ${realPath}`);
-
-    const confirm = await askQuestion(`✅ Are these paths correct? (y/n): `, rl);
-    if (confirm.toLowerCase() === 'y' || confirm.toLowerCase() === 'yes') {
-      await updateEnvFile("TEST_VAULT", testPath);
-      await updateEnvFile("REAL_VAULT", realPath);
-      confirmed = true;
-    } else {
-      console.log(`🔄 Let's try again...\n`);
-    }
-  }
-}
 
 async function updateEnvFile(envKey: string, vaultPath: string): Promise<void> {
   const envPath = path.join(pluginDir, '.env');
@@ -93,7 +60,23 @@ async function updateEnvFile(envKey: string, vaultPath: string): Promise<void> {
   console.log(`✅ Updated ${envKey} in .env file`);
 }
 
+function validateVaultPath(vaultPath: string): boolean {
+  // Check if the path contains .obsidian directory
+  const obsidianPath = path.join(vaultPath, ".obsidian");
+  const pluginsPath = path.join(vaultPath, ".obsidian", "plugins");
+
+  return fs.existsSync(obsidianPath) && fs.existsSync(pluginsPath);
+}
+
 function getVaultPath(vaultPath: string): string {
+  // Validate that this is a proper vault path
+  if (!validateVaultPath(vaultPath)) {
+    console.error(`❌ Invalid vault path: ${vaultPath}`);
+    console.error(`   The path must contain a .obsidian/plugins directory`);
+    console.error(`   Please enter a valid Obsidian vault path`);
+    process.exit(1);
+  }
+
   // Check if the path already contains the plugins directory path
   const pluginsPath = path.join(".obsidian", "plugins");
   if (vaultPath.includes(pluginsPath)) {
@@ -160,69 +143,28 @@ async function getBuildPath(isProd: boolean): Promise<string> {
   const envKey = useRealVault ? "REAL_VAULT" : "TEST_VAULT";
   const vaultPath = process.env[envKey]?.trim();
 
-  // Handle empty vault paths with intelligent logic
+  // If empty or undefined, we're already in the plugin folder
   if (!vaultPath) {
     // Check if we're in Obsidian plugins folder
     const currentPath = process.cwd();
     const isInObsidianPlugins = currentPath.includes('.obsidian/plugins') ||
       currentPath.includes('.obsidian\\plugins');
 
-    const testVault = process.env.TEST_VAULT?.trim();
-    const realVault = process.env.REAL_VAULT?.trim();
-
-    // YARN REAL logic
-    if (envKey === "REAL_VAULT") {
-      if (!isInObsidianPlugins) {
-        // External development: ask for both if missing
-        if (!testVault || !realVault) {
-          await promptForBothVaults();
-          config();
-          // After updating both, get the REAL_VAULT path directly
-          const updatedRealVault = process.env.REAL_VAULT?.trim();
-          if (updatedRealVault) {
-            return getVaultPath(updatedRealVault);
-          }
-        } else {
-          const newPath = await promptForVaultPath(envKey);
-          await updateEnvFile(envKey, newPath);
-          config();
-          return getVaultPath(newPath);
-        }
-      } else {
-        // In obsidian/plugins: ask only for REAL_VAULT
-        const newPath = await promptForVaultPath(envKey);
-        await updateEnvFile(envKey, newPath);
-        return getVaultPath(newPath);
-      }
-    }
-
-    // YARN DEV/START logic
-    if (envKey === "TEST_VAULT") {
-      if (!isInObsidianPlugins) {
-        // External development: ask for both if missing
-        if (!testVault || !realVault) {
-          await promptForBothVaults();
-          config();
-          // After updating both, get the TEST_VAULT path directly
-          const updatedTestVault = process.env.TEST_VAULT?.trim();
-          if (updatedTestVault) {
-            return getVaultPath(updatedTestVault);
-          }
-        } else {
-          const newPath = await promptForVaultPath(envKey);
-          await updateEnvFile(envKey, newPath);
-          return getVaultPath(newPath);
-        }
-      } else {
-        // In obsidian/plugins: allow in-place development
-        console.log(`ℹ️  Building in Obsidian plugins folder (in-place development)`);
-        return pluginDir;
-      }
+    if (isInObsidianPlugins) {
+      // In obsidian/plugins: allow in-place development
+      console.log(`ℹ️  Building in Obsidian plugins folder (in-place development)`);
+      return pluginDir;
+    } else {
+      // External development: prompt for missing vault path
+      const newPath = await promptForVaultPath(envKey);
+      await updateEnvFile(envKey, newPath);
+      config();
+      return getVaultPath(newPath);
     }
   }
 
   // If we reach here, use the vault path directly
-  return vaultPath ? getVaultPath(vaultPath) : pluginDir;
+  return getVaultPath(vaultPath);
 }
 
 async function createBuildContext(buildPath: string, isProd: boolean, entryPoints: string[]): Promise<esbuild.BuildContext> {
@@ -266,7 +208,7 @@ async function createBuildContext(buildPath: string, isProd: boolean, entryPoint
           build.onEnd(async () => {
             // if real or build
             if (isProd) {
-              if (process.argv.includes("-r")) {
+              if (process.argv.includes("-r") || process.argv.includes("real")) {
                 await copyFilesToTargetDir(buildPath);
                 console.log(`Successfully installed in ${buildPath}`);
               } else {

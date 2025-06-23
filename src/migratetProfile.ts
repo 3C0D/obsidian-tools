@@ -9,7 +9,7 @@ import { picker } from "./utils.ts";
 export async function migrateProfile(plugin: Tools, app: App, isImport = true, customPath?: string): Promise<void> {
     try {
         const sourceOrDest = customPath ? path.join(customPath, '.obsidian') : await getVaultDirPath('.obsidian', isImport);
-        if (!sourceOrDest) return
+        if (!sourceOrDest) return;
 
         const action = isImport ? 'Import' : 'Export';
         const res = await openMigrateModal(plugin, app, sourceOrDest, `${action} vault options`, isImport);
@@ -22,9 +22,9 @@ export async function migrateProfile(plugin: Tools, app: App, isImport = true, c
 
             if (isImport) {
                 // reload app
-                new Notice("Success!, App will reload...")
+                new Notice("Success!, App will reload...");
                 setTimeout(async () => {
-                    app.commands.executeCommandById("app:reload")
+                    app.commands.executeCommandById("app:reload");
                 }, 1500);
             } else {
                 new Notice(`${action} operations finished successfully`);
@@ -51,8 +51,8 @@ async function getVaultDirPath(complement: string, isImport = true): Promise<str
 
 
 async function migrateVaultDirectories(plugin: Tools, app: App, dirPath: string, isImport = true): Promise<void> {
-    const obsidian = app.vault.adapter.getFullPath(".obsidian")
-    const { vaultDirs } = plugin.settings
+    const obsidian = app.vault.adapter.getFullPath(".obsidian");
+    const { vaultDirs } = plugin.settings;
 
     for (const [key, isEnabled] of Object.entries(vaultDirs)) {
         if (!isEnabled) continue;
@@ -90,7 +90,7 @@ async function copyPluginDirectory(src: string, dest: string): Promise<void> {
 }
 
 async function migrateVaultJsonFiles(plugin: Tools, app: App, dirPath: string, isImport = true): Promise<void> {
-    const obsidian = app.vault.adapter.getFullPath(".obsidian")
+    const obsidian = app.vault.adapter.getFullPath(".obsidian");
     const { vaultFiles } = plugin.settings;
 
     for (const [key, isEnabled] of Object.entries(vaultFiles)) {

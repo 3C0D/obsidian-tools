@@ -116,7 +116,7 @@ class FolderListModal extends FuzzySuggestModal<TFolder> {
 export function getAllFolders(app: App): TFolder[] {
     const folders: TFolder[] = [];
 
-    function collectFolders(folder: TFolder) {
+    function collectFolders(folder: TFolder): void {
         // Skip root folder
         if (folder.path !== "/") {
             folders.push(folder);

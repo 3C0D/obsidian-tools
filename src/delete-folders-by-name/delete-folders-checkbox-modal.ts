@@ -21,7 +21,7 @@ export class DeleteFoldersCheckboxModal extends Modal {
         }
     }
 
-    onOpen() {
+    onOpen(): void {
         const { contentEl } = this;
         contentEl.empty();
 
@@ -146,7 +146,7 @@ export class DeleteFoldersCheckboxModal extends Modal {
             });
     }
 
-    onClose() {
+    onClose(): void {
         this.contentEl.empty();
     }
 

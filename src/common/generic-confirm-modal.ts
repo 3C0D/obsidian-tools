@@ -1,5 +1,5 @@
 import { App, Modal, Setting } from "obsidian";
-import type { ConfirmCallback } from "../types/global.js";
+import type { ConfirmCallback } from "../types/global.d.ts";
 
 /**
  * A generic confirmation modal that can be used by different features
@@ -16,7 +16,7 @@ export class GenericConfirmModal extends Modal {
         super(app);
     }
 
-    onOpen() {
+    onOpen(): void {
         const { contentEl } = this;
         contentEl.empty();
 
@@ -49,7 +49,7 @@ export class GenericConfirmModal extends Modal {
                     }));
     }
 
-    onClose() {
+    onClose(): void {
         this.contentEl.empty();
     }
 }

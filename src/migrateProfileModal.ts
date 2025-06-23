@@ -24,19 +24,19 @@ class MigrateModal extends Modal {
         this.initializeDestinationDirPath();
     }
 
-    private initializeDestinationDirPath() {
+    private initializeDestinationDirPath(): void {
         // Keep the dirPath as passed in constructor
         // For import: dirPath = source vault
         // For export: dirPath = destination vault
     }
 
-    async onOpen() {
+    async onOpen(): Promise<void> {
         const { contentEl } = this;
         contentEl.empty();
         contentEl.createEl('h2', { text: this.message });
 
-        await this.updateVaultItemsList(true)
-        await this.updateVaultItemsList(false)
+        await this.updateVaultItemsList(true);
+        await this.updateVaultItemsList(false);
 
         // Display summary of detected items
         const dirCount = Object.keys(this.plugin.settings.vaultDirs).length;
@@ -52,7 +52,7 @@ class MigrateModal extends Modal {
         this.createMigrateSettingsSection('Directories', this.plugin.settings.vaultDirs);
         this.createMigrateSettingsSection('Files', this.plugin.settings.vaultFiles);
 
-        await this.plugin.saveSettings()
+        await this.plugin.saveSettings();
 
         new Setting(this.contentEl)
             .addButton((btn) => {
