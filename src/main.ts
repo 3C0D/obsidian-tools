@@ -9,12 +9,13 @@ import { addImportToVault } from "./import-to-vault/import-to-vault.ts";
 import { registerDeleteFoldersByName } from "./delete-folders-by-name/delete-folders-by-name.ts";
 import { registerSearchFolders } from "./search-folders/search-folders.ts";
 import { addDeleteEmptyFolders } from "./delete-empty-folders/delete-empty-folders.ts";
+import { copyWithoutMarkdown } from "./copy-without-markdown/copy-without-markdown.ts";
 
 
 export default class Tools extends Plugin {
 	settings: ToolsSettings;
 
-	async onload(): Promise<void>	 {
+	async onload(): Promise<void> {
 		await this.loadSettings();
 		this.addSettingTab(new ToolsSettingTab(this.app, this));
 
@@ -66,6 +67,17 @@ export default class Tools extends Plugin {
 		// Register the delete empty folders command if enabled
 		if (this.settings['delete-empty-folders']) {
 			addDeleteEmptyFolders.call(this, this.app);
+		}
+
+		// Register the copy without markdown command if enabled
+		if (this.settings['copy-without-markdown']) {
+			this.addCommand({
+				id: 'copy-without-markdown',
+				name: 'Copy text without markdown',
+				editorCallback: (editor) => {
+					copyWithoutMarkdown(this.app, editor);
+				},
+			});
 		}
 	}
 

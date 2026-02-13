@@ -7,6 +7,7 @@ import { registerSearchFolders } from "../search-folders/search-folders.ts";
 import { addImportToVault } from "../import-to-vault/import-to-vault.ts";
 import { registerOutOfVault, createMoveFilesMenuCallback } from "../move-ou-from-vault/move-out-menus.ts";
 import { addDeleteEmptyFolders, createDeleteEmptyFoldersMenu } from "../delete-empty-folders/delete-empty-folders.ts";
+import { copyWithoutMarkdown } from "../copy-without-markdown/copy-without-markdown.ts";
 
 
 export const DEFAULT_SETTINGS: Readonly<ToolsSettings> = {
@@ -17,6 +18,7 @@ export const DEFAULT_SETTINGS: Readonly<ToolsSettings> = {
     "delete-folders-by-name": true,
     "search-folders": true,
     "delete-empty-folders": true,
+    "copy-without-markdown": true,
     vaultDirs: {},
     vaultFiles: {},
     selectedPlugins: {}
@@ -105,5 +107,23 @@ export const settingsList: ToggleElement[] = [
             }
         },
         name: "delete empty folders (when turned off a reload is done)"
+    }, {
+        setting: "copy-without-markdown",
+        callback: async function (app: App, plugin: Tools, value: boolean): Promise<void> {
+            if (value) {
+                // Enregistrer la commande
+                plugin.addCommand({
+                    id: 'copy-without-markdown',
+                    name: 'Copy text without markdown',
+                    editorCallback: (editor) => {
+                        copyWithoutMarkdown(app, editor);
+                    },
+                });
+            } else {
+                // Supprimer la commande
+                app.commands.removeCommand('obsidian-my-tools:copy-without-markdown');
+            }
+        },
+        name: "copy text without markdown"
     }
 ];

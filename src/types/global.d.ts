@@ -10,6 +10,7 @@ declare module "obsidian-typings" {
     "delete-folders-by-name": boolean;
     "search-folders": boolean;
     "delete-empty-folders": boolean;
+    "copy-without-markdown": boolean;
   }
 
   interface ToolsSettings extends toToggle {

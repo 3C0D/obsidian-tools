@@ -1,1 +1,1 @@
-ts fix after injection
+copy text without markdown

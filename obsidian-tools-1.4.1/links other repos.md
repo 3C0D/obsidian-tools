@@ -1,1 +1,0 @@
-[obsidian-show-hidden-files](https://github.com/polyipseity/obsidian-show-hidden-files)

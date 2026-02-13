@@ -118,6 +118,15 @@ Select which plugins you want to export.
 - Shows a confirmation dialog with checkboxes for each empty folder found
 - All selected empty folders are moved to trash
 
+## Copy text without markdown:
+- Copy selected text from your notes without any Markdown formatting
+- Removes all Markdown syntax: headings (#), bold (**), italic (*), code (`), links, images, etc.
+- Handles Obsidian-specific syntax: wiki links ([[...]]), embeds (![[...]]), block IDs (^abc)
+- Supports code blocks with 3-5 backticks
+- Especially useful for pasting into chat applications like Claude, avoiding extension conflicts that can cause freezing
+- **Recommended hotkey**: Ctrl+Shift+C (or Cmd+Shift+C on Mac)
+- Access via command palette: "Copy text without markdown"
+
 ## Additional features
 - ~~Search from directory~~ (Now native in Obsidian)
 - Each part of the plugin can be disabled in settings.
