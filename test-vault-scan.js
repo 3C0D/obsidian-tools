@@ -65,5 +65,5 @@ async function testVaultScan(obsidianPath) {
 }
 
 // Test with the actual vault path
-const vaultPath = 'C:/Users/dd200/Documents/obsidian_vaults/Portable/.obsidian';
+const vaultPath = 'C:/Users/dd200/Documents/Vaults/Portable/.obsidian';
 testVaultScan(vaultPath);
